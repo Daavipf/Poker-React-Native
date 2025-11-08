@@ -5,7 +5,9 @@ export type player = {
   nome: string
   fichas: number
   mao: card[] | []
-  apostaAtual: number
+  apostaNaRodada: number
   saiu: boolean
   allIn: boolean
+  type: "JOGADOR" | "IA"
+  role?: "Dealer" | "Small Blind" | "Big Blind"
 }

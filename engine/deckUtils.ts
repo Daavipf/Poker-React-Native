@@ -28,4 +28,19 @@ export default class DeckUtils {
     })
     return [novosJogadores, deckIndex]
   }
+
+  static setTableCards(novoBaralho: card[], indexInicio: number): [card[], number] {
+    let cartasComunitarias = []
+    let deckIndex = indexInicio
+    for (let i = 0; i < 3; i++) {
+      cartasComunitarias.push(novoBaralho[deckIndex++])
+    }
+    return [cartasComunitarias, deckIndex]
+  }
+
+  static setNewTableCard(baralho: card[], cartasComunitarias: card[], indexInicio: number): [card[], number] {
+    let deckIndex = indexInicio
+    cartasComunitarias.push(baralho[deckIndex++])
+    return [cartasComunitarias, deckIndex]
+  }
 }

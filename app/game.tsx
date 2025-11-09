@@ -64,6 +64,7 @@ export default function Game() {
         {/* Os botões apenas enviam ações. Eles não sabem a lógica. */}
         <Button buttonTitle="Fold" onPress={() => dispatch({ type: "ACAO_JOGADOR", payload: { move: "FOLD" } })} />
         <Button buttonTitle="Call" onPress={() => dispatch({ type: "ACAO_JOGADOR", payload: { move: "CALL" } })} />
+        <Button buttonTitle="Check" onPress={() => dispatch({ type: "ACAO_JOGADOR", payload: { move: "CHECK" } })} />
         <Button
           buttonTitle="Raise"
           onPress={() => dispatch({ type: "ACAO_JOGADOR", payload: { move: "RAISE", amount: 50 } })}

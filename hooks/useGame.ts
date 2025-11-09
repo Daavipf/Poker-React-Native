@@ -1,5 +1,5 @@
-import { baralhoInicial } from "@/game/cards"
-import { gameReducer } from "@/game/gameReducer"
+import { baralhoInicial } from "@/engine/cards"
+import { gameReducer } from "@/engine/gameReducer"
 import { gameState } from "@/types/gameState"
 import { useReducer } from "react"
 
@@ -12,7 +12,7 @@ const initialState: gameState = {
   indiceJogadorAtivo: 0,
   indiceDealer: -1,
   apostaAtual: 0,
-  ultimoRaise: -1,
+  indiceUltimoRaise: -1,
   jogadores: [
     { id: "p1", type: "JOGADOR", nome: "Jogador", apostaNaRodada: 0, fichas: 1000, mao: [], saiu: false, allIn: false },
     { id: "ia1", type: "IA", nome: "IA 1", apostaNaRodada: 0, fichas: 1000, mao: [], saiu: false, allIn: false },

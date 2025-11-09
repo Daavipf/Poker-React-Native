@@ -11,5 +11,5 @@ export interface gameState {
   indiceJogadorAtivo: number
   indiceDealer: number
   apostaAtual: number
-  ultimoRaise: number
+  indiceUltimoRaise: number
 }

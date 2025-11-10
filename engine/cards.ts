@@ -15,10 +15,10 @@ export let baralhoInicial: card[] = []
 for (const naipe of NAIPES) {
   for (const valor of VALORES) {
     baralhoInicial.push({
-      id: `${valor}${naipe}`, // ex: "KC" (para Key no React)
-      valor: valor, // ex: "K"
-      naipe: naipe, // ex: "C"
-      peso: getPeso(valor), // ex: 13
+      id: `${valor}${naipe}`,
+      valor: valor,
+      naipe: naipe,
+      peso: getPeso(valor),
     })
   }
 }

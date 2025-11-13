@@ -46,8 +46,9 @@ export default function Game() {
         {state.jogadores.map((jogador, index) => (
           <View key={jogador.id}>
             <Text style={[style.center, jogador.saiu ? style.foldedPlayer : null]}>
-              {jogador.nome} ({jogador.role![0] || "N/A"}) - {jogador.fichas}
+              {jogador.nome} ({jogador.role![0] || "N/A"}) - {jogador.fichas} - {jogador.apostaNaRodada}
             </Text>
+
             <View style={style.communityCardsContainer}>
               {jogador.mao.map((carta) => (
                 <Text key={carta.id}>{carta.id}</Text>

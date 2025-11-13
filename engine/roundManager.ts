@@ -2,6 +2,7 @@ import { gameState } from "@/types/gameState"
 import { player } from "@/types/player"
 import { constants } from "./constants"
 import DeckUtils from "./deckUtils"
+import HandEvaluator from "./HandEvaluator"
 import Utils from "./utils"
 
 export default class RoundManager {
@@ -59,7 +60,63 @@ export default class RoundManager {
       novoDeckIndex = index
     } else if (novaFase === "RIVER") {
       novaFase = "SHOWDOWN"
-      // TODO: lógica de distribuição de pot
+      // const activePlayers = state.jogadores.filter((j) => j.saiu === false)
+
+      // const handResults = activePlayers.map((player) => {
+      //   const hand = [...player.mao, ...state.cartasComunitarias]
+      //   return {
+      //     result: HandEvaluator.evaluateHand(hand),
+      //     player,
+      //   }
+      // })
+
+      // let vencedores = [handResults[0]]
+      // for (let i = 1; i < handResults.length; i++) {
+      //   const currentHand = handResults[i]
+      //   const bestHand = vencedores[0]
+
+      //   if (currentHand.result.nivel < bestHand.result.nivel) continue
+      //   if (currentHand.result.nivel > bestHand.result.nivel) {
+      //     vencedores = [currentHand]
+      //     continue
+      //   }
+
+      //   if (currentHand.result.nivel === bestHand.result.nivel) {
+      //     // OBS: numeração de mãos: -1 (mão atual); 0 (mãos iguais); 1 (melhor mão que já foi definida)
+      //     let desempate = 0
+
+      //     // OBS: os resultados de mãos são objetos com regras pré-definidas, assim, a cada nível, é garantido que
+      //     // os arrays de kickers tenham o mesmo tamanho
+      //     for (let k = 0; k < bestHand.result.kickers.length; k++) {
+      //       if (currentHand.result.kickers[k] > bestHand.result.kickers[k]) {
+      //         desempate = -1
+      //         break
+      //       }
+      //       if (currentHand.result.kickers[k] < bestHand.result.kickers[k]) {
+      //         desempate = 1
+      //         break
+      //       }
+      //     }
+
+      //     if (desempate === -1) {
+      //       vencedores = [currentHand]
+      //     } else if (desempate === 0) {
+      //       vencedores.push(currentHand)
+      //     }
+      //   }
+      // }
+
+      // const valorPorVencedor = state.pot / vencedores.length
+
+      // vencedores.forEach((vencedor) => {
+      //   const jogadorVencedor = stateComCartasNovas.jogadores.find((j) => j.id === vencedor.player.id)
+      //   if (jogadorVencedor) {
+      //     jogadorVencedor.fichas += valorPorVencedor
+      //   }
+      // })
+
+      // stateComCartasNovas.pot = 0
+      this.evaluateHands(state, stateComCartasNovas)
     } else if (novaFase === "SHOWDOWN") {
       return this.startRound(state)
     }
@@ -95,5 +152,64 @@ export default class RoundManager {
 
       return RoundManager.startRound({ ...state, jogadores: jogadoresComPoteNoVencedor, pot: 0 })
     }
+  }
+
+  private static evaluateHands(state: gameState, stateComCartasNovas: gameState) {
+    const activePlayers = state.jogadores.filter((j) => j.saiu === false)
+
+    const handResults = activePlayers.map((player) => {
+      const hand = [...player.mao, ...state.cartasComunitarias]
+      return {
+        result: HandEvaluator.evaluateHand(hand),
+        player,
+      }
+    })
+
+    let vencedores = [handResults[0]]
+    for (let i = 1; i < handResults.length; i++) {
+      const currentHand = handResults[i]
+      const bestHand = vencedores[0]
+
+      if (currentHand.result.nivel < bestHand.result.nivel) continue
+      if (currentHand.result.nivel > bestHand.result.nivel) {
+        vencedores = [currentHand]
+        continue
+      }
+
+      if (currentHand.result.nivel === bestHand.result.nivel) {
+        // OBS: numeração de mãos: -1 (mão atual); 0 (mãos iguais); 1 (melhor mão que já foi definida)
+        let desempate = 0
+
+        // OBS: os resultados de mãos são objetos com regras pré-definidas, assim, a cada nível, é garantido que
+        // os arrays de kickers tenham o mesmo tamanho
+        for (let k = 0; k < bestHand.result.kickers.length; k++) {
+          if (currentHand.result.kickers[k] > bestHand.result.kickers[k]) {
+            desempate = -1
+            break
+          }
+          if (currentHand.result.kickers[k] < bestHand.result.kickers[k]) {
+            desempate = 1
+            break
+          }
+        }
+
+        if (desempate === -1) {
+          vencedores = [currentHand]
+        } else if (desempate === 0) {
+          vencedores.push(currentHand)
+        }
+      }
+    }
+
+    const valorPorVencedor = state.pot / vencedores.length
+
+    vencedores.forEach((vencedor) => {
+      const jogadorVencedor = stateComCartasNovas.jogadores.find((j) => j.id === vencedor.player.id)
+      if (jogadorVencedor) {
+        jogadorVencedor.fichas += valorPorVencedor
+      }
+    })
+
+    stateComCartasNovas.pot = 0
   }
 }

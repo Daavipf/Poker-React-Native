@@ -46,13 +46,14 @@ export default class Utils {
     //const primeiroAposDealer = (state.indiceDealer + 1) % state.jogadores.length
     const proximoJogador = this.setNextPlayerIndex(state.indiceDealer, state.jogadores)
 
-    const jogadoresResetados = state.jogadores.map((jogador) => {
+    const jogadoresResetados: player[] = state.jogadores.map((jogador) => {
       if (jogador.saiu || jogador.allIn) {
         return jogador
       }
       return {
         ...jogador,
         apostaNaRodada: 0,
+        lastMove: undefined,
       }
     })
 

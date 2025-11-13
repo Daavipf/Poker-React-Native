@@ -10,4 +10,5 @@ export type player = {
   allIn: boolean
   type: "JOGADOR" | "IA"
   role?: "Dealer" | "Small Blind" | "Big Blind"
+  lastMove?: "FOLD" | "CALL" | "RAISE" | "CHECK" | "ALL-IN"
 }

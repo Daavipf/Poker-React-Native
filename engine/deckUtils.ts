@@ -23,7 +23,7 @@ export default class DeckUtils {
         mao: [novoBaralho[deckIndex++], novoBaralho[deckIndex++]],
         saiu: false,
         allIn: false,
-        apostaAtual: 0,
+        apostaNaRodada: 0,
       }
     })
     return [novosJogadores, deckIndex]

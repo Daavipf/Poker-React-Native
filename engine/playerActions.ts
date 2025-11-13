@@ -1,16 +1,18 @@
 import { gameState } from "@/types/gameState"
+import { player } from "@/types/player"
 import RoundManager from "./roundManager"
 import Utils from "./utils"
 
 export default class PlayerActions {
   static playerFold(state: gameState): gameState {
-    const novosJogadores = state.jogadores.map((jogador, index) => {
+    const novosJogadores: player[] = state.jogadores.map((jogador, index) => {
       if (index === state.indiceJogadorAtivo) {
         return {
           ...jogador,
           apostaAtual: 0,
           mao: [],
           saiu: true,
+          lastMove: "FOLD",
         }
       } else {
         return jogador
@@ -24,9 +26,9 @@ export default class PlayerActions {
 
     const indiceProximoJogador = Utils.setNextPlayerIndex(state.indiceJogadorAtivo, novosJogadores)
 
-    if (indiceProximoJogador === state.indiceUltimoRaise) {
-      return RoundManager.nextPhase({ ...state, jogadores: novosJogadores, indiceJogadorAtivo: indiceProximoJogador })
-    }
+    // if (indiceProximoJogador === state.indiceUltimoRaise) {
+    //   return RoundManager.nextPhase({ ...state, jogadores: novosJogadores, indiceJogadorAtivo: indiceProximoJogador })
+    // }
 
     return { ...state, jogadores: novosJogadores, indiceJogadorAtivo: indiceProximoJogador }
   }
@@ -41,12 +43,13 @@ export default class PlayerActions {
       // NOTA: Aqui entraria a lógica de ALL-IN
       return state // Por enquanto, apenas ignora
     }
-    const novosJogadores = state.jogadores.map((jogador, index) => {
+    const novosJogadores: player[] = state.jogadores.map((jogador, index) => {
       if (index === state.indiceJogadorAtivo) {
         return {
           ...jogador,
-          apostaNaRodada: amount!,
+          apostaNaRodada: custoRealAposta!,
           fichas: jogador.fichas - custoRealAposta,
+          lastMove: "RAISE",
         }
       } else {
         return jogador
@@ -72,13 +75,14 @@ export default class PlayerActions {
     if (custoRealAposta > jogadorAtual.fichas) {
       // TODO implementar lógica de All-in
       const fichasReais = jogadorAtual.fichas
-      const novosJogadores = state.jogadores.map((jogador, index) => {
+      const novosJogadores: player[] = state.jogadores.map((jogador, index) => {
         if (index === state.indiceJogadorAtivo) {
           return {
             ...jogador,
             fichas: 0,
             apostaNaRodada: jogadorAtual.apostaNaRodada + fichasReais,
             allIn: true,
+            lastMove: "CALL",
           }
         } else {
           return jogador
@@ -95,12 +99,13 @@ export default class PlayerActions {
       }
     }
 
-    const novosJogadores = state.jogadores.map((jogador, index) => {
+    const novosJogadores: player[] = state.jogadores.map((jogador, index) => {
       if (index === state.indiceJogadorAtivo) {
         return {
           ...jogador,
           fichas: jogador.fichas - custoRealAposta,
           apostaNaRodada: state.apostaAtual,
+          lastMove: "CALL",
         }
       } else {
         return jogador
@@ -125,11 +130,23 @@ export default class PlayerActions {
       return state
     }
 
-    const novoIndiceJogador = Utils.setNextPlayerIndex(state.indiceJogadorAtivo, state.jogadores)
+    const novosJogadores: player[] = state.jogadores.map((jogador, index) => {
+      if (index === state.indiceJogadorAtivo) {
+        return {
+          ...jogador,
+          lastMove: "CHECK",
+        }
+      } else {
+        return jogador
+      }
+    })
+
+    const novoIndiceJogador = Utils.setNextPlayerIndex(state.indiceJogadorAtivo, novosJogadores)
 
     return {
       ...state,
       indiceJogadorAtivo: novoIndiceJogador,
+      jogadores: novosJogadores,
     }
   }
 }

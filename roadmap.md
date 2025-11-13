@@ -34,7 +34,7 @@ Seu objetivo aqui é ter um `reducer` que conheça **todas as regras** do poker,
 
 Ainda estamos na lógica de negócios, fora do React.
 
-4.  **Avaliador de Mãos (O "Juiz")**
+4.  ✅ **Avaliador de Mãos (O "Juiz")**
 
     - Crie uma função _externa_ (ex: `HandEvaluator.js`).
     - Esta função terá uma única responsabilidade: receber 7 cartas (5 da mesa + 2 do jogador) e retornar a melhor mão de 5 cartas possível (ex: `{ rank: 'FLUSH', highCard: 'K' }`).

@@ -1,6 +1,6 @@
 import { card } from "@/types/card"
 
-interface result {
+export interface result {
   nivel: number
   nome:
     | "Royal Flush"

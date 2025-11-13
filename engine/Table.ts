@@ -47,15 +47,6 @@ export default class Table implements table {
   setNextDealer(players: iplayer[]): void {
     let iNextPlayer = (this.iDealer + 1) % players.length
 
-    // while (players[iNextPlayer].isFold || players[iNextPlayer].isAllIn) {
-    //   let iNextPlayer = (this.iDealer + 1) % players.length
-
-    //   if (iNextPlayer === this.iDealer) {
-    //     this.iDealer = iNextPlayer
-    //     return
-    //   }
-    // }
-
     this.iDealer = iNextPlayer
   }
 

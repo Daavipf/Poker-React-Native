@@ -1,6 +1,8 @@
 import { deck } from "@/types/deck"
+import { gamePhase } from "@/types/gameState"
 import { iplayer } from "@/types/iplayer"
 import { table } from "@/types/table"
+import RoundManager from "./roundManager"
 
 export interface action {
   type: "INICIAR_RODADA" | "ACAO_JOGADOR" | "AVANCAR_FASE"
@@ -10,27 +12,20 @@ export interface action {
 export interface tempGameState {
   deck: deck
   players: iplayer[]
-  phase: "PREFLOP" | "FLOP" | "TURN" | "RIVER" | "SHOWDOWN"
+  phase: gamePhase
   table: table
+  message: string
 }
 
 export function gameReducer(state: tempGameState, action: action): tempGameState {
   const newDeck = state.deck.clone()
   const newTable = state.table.clone()
   let newPlayers = state.players.map((player) => player.clone())
+  let newMessage = state.message
 
   switch (action.type) {
     case "INICIAR_RODADA":
-      newPlayers = newTable.setPlayersHands(newPlayers, newDeck)
-
-      newPlayers = newTable.setDealerAndBlinds(newPlayers)
-
-      return {
-        ...state,
-        deck: newDeck,
-        table: newTable,
-        players: newPlayers,
-      }
+      return RoundManager.setUpNewPhase(state)
     case "ACAO_JOGADOR":
       const { move, amount } = action.payload!
       const iCurrentPlayer = newTable.iCurrentPlayer
@@ -50,20 +45,33 @@ export function gameReducer(state: tempGameState, action: action): tempGameState
         newTable.currentBet = bet
         newTable.setNextPlayer(newPlayers)
       } else if (move === "CHECK") {
-        if (currentPlayer.currentBet !== newTable.currentBet) {
-          return state
+        if (currentPlayer.currentBet < newTable.currentBet) {
+          newMessage = "CHECK inválido: Aposta não coberta."
+          return { ...state, message: newMessage }
         }
         newTable.setNextPlayer(newPlayers)
       } else {
-        return state
+        newMessage = "Ação não reconhecida"
+        return { ...state, message: newMessage }
       }
 
-      return {
+      let lastRaiserPlayer = newPlayers[newTable.iLastRaiser]
+      let newPhase = state.phase
+      let newState = {
         ...state,
         deck: newDeck,
         table: newTable,
         players: newPlayers,
+        message: newMessage,
+        phase: newPhase,
       }
+
+      if (lastRaiserPlayer.name === currentPlayer.name) {
+        newPhase = RoundManager.advancePhase(state.phase)
+        newState = RoundManager.setUpNewPhase({ ...newState, phase: newPhase })
+      }
+
+      return newState
     case "AVANCAR_FASE":
       return state
     default:

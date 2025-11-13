@@ -1,11 +1,65 @@
-import { gameState } from "@/types/gameState"
-import { player } from "@/types/player"
-import { constants } from "./constants"
-import DeckUtils from "./deckUtils"
-import HandEvaluator from "./HandEvaluator"
-import Utils from "./utils"
+import { gamePhase } from "@/types/gameState"
+import { tempGameState } from "./gameReducer"
 
 export default class RoundManager {
+  static advancePhase(currentPhase: gamePhase): gamePhase {
+    switch (currentPhase) {
+      case "PREFLOP":
+        return "FLOP"
+      case "FLOP":
+        return "TURN"
+      case "TURN":
+        return "RIVER"
+      case "RIVER":
+        return "SHOWDOWN"
+      case "SHOWDOWN":
+        return "PREFLOP"
+      default:
+        return "PREFLOP"
+    }
+  }
+
+  static setUpNewPhase(state: tempGameState): tempGameState {
+    const newDeck = state.deck.clone()
+    const newTable = state.table.clone()
+    let newPlayers = state.players.map((player) => player.clone())
+    let newMessage = state.message
+    let cards
+
+    switch (state.phase) {
+      case "PREFLOP":
+        newPlayers = newTable.setPlayersHands(newPlayers, newDeck)
+        newPlayers = newTable.setDealerAndBlinds(newPlayers)
+        break
+      case "FLOP":
+        cards = [newDeck.drawCard(), newDeck.drawCard(), newDeck.drawCard()]
+        newTable.addCards(cards)
+        break
+      case "TURN":
+        cards = [newDeck.drawCard()]
+        newTable.addCards(cards)
+        break
+      case "RIVER":
+        cards = [newDeck.drawCard()]
+        newTable.addCards(cards)
+        break
+      case "SHOWDOWN":
+        break
+      default:
+        break
+    }
+
+    return {
+      ...state,
+      deck: newDeck,
+      table: newTable,
+      players: newPlayers,
+      message: newMessage,
+    }
+  }
+}
+
+/*export default class RoundManager {
   static startRound(state: gameState): gameState {
     const novoBaralho = DeckUtils.shuffleDeck(state.baralho)
     let indexControleBaralho = 0
@@ -213,3 +267,4 @@ export default class RoundManager {
     stateComCartasNovas.pot = 0
   }
 }
+*/

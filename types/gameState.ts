@@ -13,3 +13,5 @@ export interface gameState {
   apostaAtual: number
   indiceUltimoRaise: number
 }
+
+export type gamePhase = "PREFLOP" | "FLOP" | "TURN" | "RIVER" | "SHOWDOWN"

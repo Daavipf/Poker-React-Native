@@ -12,6 +12,7 @@ const initialState: tempGameState = {
   ],
   phase: "PREFLOP",
   table: new Table(),
+  message: "",
 }
 
 const foldAction: action = { type: "ACAO_JOGADOR", payload: { move: "FOLD" } }
@@ -33,8 +34,10 @@ describe("gameReducer", () => {
 
     expect(newState.table.iCurrentPlayer).toBe(0)
     expect(newState.table.iDealer).toBe(0)
+
     let iBigBlind = (newState.table.iDealer + 2) % newState.players.length
     expect(newState.players[iBigBlind].currentBet).toBe(50)
+
     let iSmallBlind = (newState.table.iDealer + 1) % newState.players.length
     expect(newState.players[iSmallBlind].currentBet).toBe(25)
 
@@ -83,6 +86,88 @@ describe("gameReducer", () => {
     expect(newState.table.currentBet).toBe(50)
     expect(newState.table.iLastRaiser).toBe(2)
     expect(newState.table.pot).toBe(150)
+  })
+
+  it("should validate CHECK correctly", () => {
+    let newState: tempGameState = gameReducer(initialState, { type: "INICIAR_RODADA" })
+    expect(newState.message).toBe("")
+    newState = gameReducer(newState, checkAction)
+    expect(newState.table.iCurrentPlayer).toBe(0)
+    expect(newState.message).toBe("CHECK inválido: Aposta não coberta.")
+  })
+
+  it("should turn phase correctly", () => {
+    let newState: tempGameState = gameReducer(initialState, { type: "INICIAR_RODADA" })
+    newState = gameReducer(newState, callAction)
+    newState = gameReducer(newState, callAction)
+    newState = gameReducer(newState, checkAction)
+
+    expect(newState.table.iCurrentPlayer).toBe(0)
+    expect(newState.phase).toBe("FLOP")
+  })
+
+  it("should reach FLOP phase correctly", () => {
+    let newState: tempGameState = gameReducer(initialState, { type: "INICIAR_RODADA" })
+    newState = gameReducer(newState, callAction)
+    newState = gameReducer(newState, callAction)
+    newState = gameReducer(newState, checkAction)
+
+    expect(newState.table.iCurrentPlayer).toBe(0)
+    expect(newState.phase).toBe("FLOP")
+    expect(newState.table.communityCards.length).toBe(3)
+  })
+
+  it("should reach TURN phase correctly", () => {
+    let newState: tempGameState = gameReducer(initialState, { type: "INICIAR_RODADA" })
+    newState = gameReducer(newState, callAction)
+    newState = gameReducer(newState, callAction)
+    for (let i = 0; i < 4; i++) {
+      newState = gameReducer(newState, checkAction)
+    }
+
+    expect(newState.table.iCurrentPlayer).toBe(0)
+    expect(newState.phase).toBe("TURN")
+    expect(newState.table.communityCards.length).toBe(4)
+  })
+
+  it("should reach RIVER phase correctly", () => {
+    let newState: tempGameState = gameReducer(initialState, { type: "INICIAR_RODADA" })
+    newState = gameReducer(newState, callAction)
+    newState = gameReducer(newState, callAction)
+    for (let i = 0; i < 7; i++) {
+      newState = gameReducer(newState, checkAction)
+    }
+
+    expect(newState.table.iCurrentPlayer).toBe(0)
+    expect(newState.phase).toBe("RIVER")
+    expect(newState.table.communityCards.length).toBe(5)
+  })
+
+  it("should reach SHOWDOWN phase correctly", () => {
+    let newState: tempGameState = gameReducer(initialState, { type: "INICIAR_RODADA" })
+    newState = gameReducer(newState, callAction)
+    newState = gameReducer(newState, callAction)
+    for (let i = 0; i < 10; i++) {
+      newState = gameReducer(newState, checkAction)
+    }
+
+    expect(newState.table.iCurrentPlayer).toBe(0)
+    expect(newState.phase).toBe("SHOWDOWN")
+    expect(newState.table.communityCards.length).toBe(5)
+  })
+
+  it("should process this run correctly", () => {
+    let newState: tempGameState = gameReducer(initialState, { type: "INICIAR_RODADA" })
+    newState = gameReducer(newState, callAction) // Jogador
+    newState = gameReducer(newState, foldAction) // IA 1
+
+    expect(newState.table.iCurrentPlayer).toBe(2)
+    expect(newState.phase).toBe("PREFLOP")
+
+    newState = gameReducer(newState, checkAction) // IA 2
+
+    expect(newState.table.iCurrentPlayer).toBe(0)
+    expect(newState.phase).toBe("FLOP")
   })
 })
 

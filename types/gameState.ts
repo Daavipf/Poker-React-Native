@@ -1,17 +1,13 @@
-import { card } from "./card"
+import { deck } from "./deck"
 import { player } from "./player"
+import { table } from "./table"
 
 export interface gameState {
-  baralho: card[]
-  deckIndex: number
-  jogadores: player[]
-  cartasComunitarias: card[]
-  pot: number
-  fase: "PREFLOP" | "FLOP" | "TURN" | "RIVER" | "SHOWDOWN"
-  indiceJogadorAtivo: number
-  indiceDealer: number
-  apostaAtual: number
-  indiceUltimoRaise: number
+  deck: deck
+  players: player[]
+  phase: gamePhase
+  table: table
+  message: string
 }
 
 export type gamePhase = "PREFLOP" | "FLOP" | "TURN" | "RIVER" | "SHOWDOWN"

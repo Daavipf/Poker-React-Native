@@ -142,16 +142,19 @@ export default class HandEvaluator {
   private static isStraight(valuesMap: valuesMap) {
     let keys = this.getValuesMapKeysArray(valuesMap)
     if (this.checkWheel(keys)) return { isStraight: true, highCard: 5 }
+    let result = { isStraight: false, highCard: -1 }
 
     for (let i = 0; i <= keys.length - 5; i++) {
       const subArray = keys.slice(i, i + 5)
+      let highCard = subArray[4]
+      let lowCard = subArray[0]
 
-      if (subArray.length === 5 && subArray[4] - subArray[0] === 4) {
-        return { isStraight: true, highCard: subArray[4] }
+      if (subArray.length === 5 && highCard - lowCard === 4) {
+        result = { isStraight: true, highCard: highCard }
       }
     }
 
-    return { isStraight: false, highCard: -1 }
+    return result
   }
 
   private static getValuesMapKeysArray(valuesMap: valuesMap) {

@@ -1,6 +1,6 @@
 import { card } from "@/types/card"
 import { deck } from "@/types/deck"
-import { iplayer } from "@/types/iplayer"
+import { player } from "@/types/player"
 import { table } from "@/types/table"
 import { constants } from "./constants"
 
@@ -29,7 +29,7 @@ export default class Table implements table {
     this.pot += amount
   }
 
-  setNextPlayer(players: iplayer[]): void {
+  setNextPlayer(players: player[]): void {
     let iNextPlayer = (this.iCurrentPlayer + 1) % players.length
 
     while (players[iNextPlayer].isFold || players[iNextPlayer].isAllIn) {
@@ -44,17 +44,17 @@ export default class Table implements table {
     this.iCurrentPlayer = iNextPlayer
   }
 
-  setNextDealer(players: iplayer[]): void {
+  setNextDealer(players: player[]): void {
     let iNextPlayer = (this.iDealer + 1) % players.length
 
     this.iDealer = iNextPlayer
   }
 
-  setNextRaiser(iPlayer: number): void {
-    this.iLastRaiser = iPlayer
+  setNextRaiser(Player: number): void {
+    this.iLastRaiser = Player
   }
 
-  setDealerAndBlinds(newPlayers: iplayer[]): iplayer[] {
+  setDealerAndBlinds(newPlayers: player[]): player[] {
     const iDealer = this.iDealer
     let iSmallBlind = (iDealer + 1) % newPlayers.length
     let iBigBlind = (iDealer + 2) % newPlayers.length
@@ -74,7 +74,7 @@ export default class Table implements table {
     return newPlayers
   }
 
-  setPlayersHands(newPlayers: iplayer[], deck: deck): iplayer[] {
+  setPlayersHands(newPlayers: player[], deck: deck): player[] {
     newPlayers.map((player) => {
       player.hand = [deck.drawCard(), deck.drawCard()]
     })

@@ -1,14 +1,18 @@
 import { card } from "@/types/card"
 
-export type player = {
-  id: string
-  nome: string
-  fichas: number
-  mao: card[] | []
-  apostaNaRodada: number
-  saiu: boolean
-  allIn: boolean
+export interface player {
+  name: string
+  chips: number
+  currentBet: number
+  hand: card[]
   type: "JOGADOR" | "IA"
-  role?: "Dealer" | "Small Blind" | "Big Blind"
-  lastMove?: "FOLD" | "CALL" | "RAISE" | "CHECK" | "ALL-IN"
+  isFold: boolean
+  isAllIn: boolean
+  setHand: (cards: card[]) => void
+  fold: () => void
+  allIn: () => number
+  raise: (currentBet: number) => number
+  call: (amount: number) => number
+  check: (currentBet: number) => void
+  clone: () => player
 }

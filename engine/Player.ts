@@ -1,8 +1,8 @@
 import { card } from "@/types/card"
-import { iplayer } from "@/types/iplayer"
+import { player } from "@/types/player"
 import { constants } from "./constants"
 
-export default class Player implements iplayer {
+export default class Player implements player {
   name: string
   chips: number
   currentBet: number
@@ -69,7 +69,7 @@ export default class Player implements iplayer {
     if (this.currentBet !== currentBet) throw new Error("CHECK inválido: Aposta não coberta.")
   }
 
-  clone(): iplayer {
+  clone(): player {
     const newPlayer = new Player(this.name, this.chips, this.type)
     newPlayer.hand = [...this.hand]
     newPlayer.isFold = this.isFold

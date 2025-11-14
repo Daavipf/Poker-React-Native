@@ -135,6 +135,25 @@ describe("HandEvaluator Tests", () => {
     expect(result.nome).toBe("Straight")
   })
 
+  // 5.2 Straight High card
+  it("should evaluate the highest Straight in a hand correctly", () => {
+    const hand: card[] = [
+      { id: "9C", valor: "9", naipe: "C", peso: 9 },
+      { id: "8E", valor: "8", naipe: "E", peso: 8 },
+      { id: "7O", valor: "7", naipe: "O", peso: 7 },
+      { id: "6P", valor: "6", naipe: "P", peso: 6 },
+      { id: "5C", valor: "5", naipe: "C", peso: 5 },
+      { id: "4C", valor: "4", naipe: "C", peso: 4 },
+      { id: "3C", valor: "3", naipe: "E", peso: 3 },
+    ]
+
+    const result: result = HandEvaluator.evaluateHand(hand)
+
+    expect(result.nivel).toBe(5)
+    expect(result.nome).toBe("Straight")
+    expect(result.kickers[0]).toBe(9)
+  })
+
   // 4. Three of a Kind (Trinca)
   // Três cartas do mesmo valor
   it("should evaluate Three of a Kind correctly", () => {

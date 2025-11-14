@@ -1,6 +1,6 @@
 import { card } from "./card"
 import { deck } from "./deck"
-import { iplayer } from "./iplayer"
+import { player } from "./player"
 
 export interface table {
   pot: number
@@ -11,10 +11,10 @@ export interface table {
   communityCards: card[]
   addCards: (cards: card[]) => void
   incrementPot: (amount: number) => void
-  setNextPlayer: (players: iplayer[]) => void
-  setNextDealer: (players: iplayer[]) => void
-  setNextRaiser: (iPlayer: number) => void
-  setDealerAndBlinds: (newPlayers: iplayer[]) => iplayer[]
-  setPlayersHands: (newPlayers: iplayer[], deck: deck) => iplayer[]
+  setNextPlayer: (players: player[]) => void
+  setNextDealer: (players: player[]) => void
+  setNextRaiser: (Player: number) => void
+  setDealerAndBlinds: (newPlayers: player[]) => player[]
+  setPlayersHands: (newPlayers: player[], deck: deck) => player[]
   clone: () => table
 }

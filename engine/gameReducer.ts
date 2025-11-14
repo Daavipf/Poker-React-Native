@@ -1,23 +1,12 @@
-import { deck } from "@/types/deck"
-import { gamePhase } from "@/types/gameState"
-import { iplayer } from "@/types/iplayer"
-import { table } from "@/types/table"
-import RoundManager from "./roundManager"
+import { gameState } from "@/types/gameState"
+import RoundManager from "./RoundManager"
 
 export interface action {
   type: "INICIAR_RODADA" | "ACAO_JOGADOR" | "AVANCAR_FASE"
   payload?: { move: "FOLD" | "CALL" | "RAISE" | "CHECK"; amount?: number }
 }
 
-export interface tempGameState {
-  deck: deck
-  players: iplayer[]
-  phase: gamePhase
-  table: table
-  message: string
-}
-
-export function gameReducer(state: tempGameState, action: action): tempGameState {
+export function gameReducer(state: gameState, action: action): gameState {
   const newDeck = state.deck.clone()
   const newTable = state.table.clone()
   let newPlayers = state.players.map((player) => player.clone())
@@ -78,54 +67,3 @@ export function gameReducer(state: tempGameState, action: action): tempGameState
       return state
   }
 }
-
-/*export function gameReducer(state: gameState, action: action) {
-  switch (action.type) {
-    case "INICIAR_RODADA":
-      return RoundManager.startRound(state)
-    case "ACAO_JOGADOR":
-      const { move, amount } = action.payload!
-      const indiceQueAgiu = state.indiceJogadorAtivo
-      let novoState: gameState
-
-      if (move == "FOLD") {
-        novoState = PlayerActions.playerFold(state)
-      } else if (move == "CALL") {
-        novoState = PlayerActions.playerCall(state)
-      } else if (move == "RAISE") {
-        novoState = PlayerActions.playerRaise(state, amount!)
-        return novoState
-      } else if (move === "CHECK") {
-        novoState = PlayerActions.playerCheck(state)
-      } else {
-        return state
-      }
-
-      if (indiceQueAgiu === novoState.indiceUltimoRaise) {
-        return RoundManager.nextPhase(novoState)
-      }
-
-      if (novoState.indiceJogadorAtivo === novoState.indiceUltimoRaise) {
-        let ultimoJogadorDaRodada = novoState.jogadores[novoState.indiceJogadorAtivo]
-        const jaAgiu = !!ultimoJogadorDaRodada.lastMove
-
-        if (novoState.fase === "PREFLOP" && ultimoJogadorDaRodada.role === "Big Blind" && !jaAgiu) {
-          return novoState
-        }
-
-        if (novoState.fase !== "PREFLOP" && novoState.apostaAtual === 0 && !jaAgiu) {
-          return novoState // Permite ao primeiro jogador agir (check ou bet)
-        }
-
-        return RoundManager.nextPhase(novoState)
-      }
-
-      return novoState
-    case "AVANCAR_FASE":
-      return RoundManager.nextPhase(state)
-
-    default:
-      return state
-  }
-}
-*/

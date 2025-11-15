@@ -40,13 +40,13 @@ Ainda estamos na lógica de negócios, fora do React.
     - Esta função terá uma única responsabilidade: receber 7 cartas (5 da mesa + 2 do jogador) e retornar a melhor mão de 5 cartas possível (ex: `{ rank: 'FLUSH', highCard: 'K' }`).
     - Esta é a parte mais complexa em termos de algoritmos de poker. Foque nela isoladamente.
 
-5.  **Lógica de `SHOWDOWN`**
+5.  ✅ **Lógica de `SHOWDOWN`**
 
     - Agora, no seu `gameReducer`, no `case 'AVANCAR_FASE'`, quando você for do `RIVER` para o `SHOWDOWN`:
     - Chame seu `HandEvaluator` para _cada_ jogador que ainda está na mão (`!saiu`).
     - Compare os resultados para encontrar o(s) vencedor(es).
 
-6.  **Distribuição de Pote**
+6.  ✅ **Distribuição de Pote**
     - Implemente a lógica que pega o(s) vencedor(es) do `SHOWDOWN` (ou o "Último Sobrevivente" do FOLD) e adiciona o `state.pot` aos `chips` dele(s).
     - _Simplificação V1:_ Esqueça potes paralelos (side-pots) por agora. Apenas dê o pote principal ao melhor.
     - Após distribuir, chame sua lógica de `INICIAR_RODA` para recomeçar.

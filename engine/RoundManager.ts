@@ -1,4 +1,5 @@
 import { gamePhase, gameState } from "@/types/gameState"
+import HandComparator from "./HandComparator"
 
 export default class RoundManager {
   static advancePhase(currentPhase: gamePhase): gamePhase {
@@ -43,7 +44,26 @@ export default class RoundManager {
         newTable.addCards(cards)
         break
       case "SHOWDOWN":
-        break
+        // TODO: implementar logica de side-pot
+        let hands = newPlayers.map((p) => {
+          return [...p.hand, ...newTable.communityCards]
+        })
+        let iWinner = HandComparator.getWinner(hands)
+
+        if (iWinner >= 0 && iWinner < newPlayers.length) {
+          let winner = newPlayers[iWinner]
+          winner.chips += newTable.pot
+          newTable.pot = 0
+        }
+
+        return RoundManager.restartGame({
+          ...state,
+          deck: newDeck,
+          table: newTable,
+          players: newPlayers,
+          message: newMessage,
+        })
+
       default:
         break
     }
@@ -54,6 +74,29 @@ export default class RoundManager {
       table: newTable,
       players: newPlayers,
       message: newMessage,
+    }
+  }
+
+  static restartGame(state: gameState): gameState {
+    const newDeck = state.deck.clone()
+    const newTable = state.table.clone()
+    let newPlayers = state.players.map((player) => player.clone())
+    let newMessage = state.message
+
+    newTable.pot = 0
+    newTable.communityCards = []
+    newTable.setNextDealer(newPlayers)
+
+    newPlayers = newTable.setPlayersHands(newPlayers, newDeck)
+    newPlayers = newTable.setDealerAndBlinds(newPlayers)
+
+    return {
+      ...state,
+      players: newPlayers,
+      deck: newDeck,
+      table: newTable,
+      message: newMessage,
+      phase: "PREFLOP",
     }
   }
 }

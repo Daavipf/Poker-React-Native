@@ -23,6 +23,14 @@ export function gameReducer(state: gameState, action: action): gameState {
       if (move === "FOLD") {
         currentPlayer.fold()
         newTable.setNextPlayer(newPlayers)
+
+        let players = newPlayers.filter((p) => !p.isFold)
+        if (players.length === 1) {
+          let iLastSurvivor = newPlayers.findIndex((p) => !p.isFold)
+          newPlayers[iLastSurvivor].chips += newTable.pot
+          newTable.pot = 0
+          return RoundManager.restartGame({ ...state, players: newPlayers })
+        }
       } else if (move === "CALL") {
         const bet = currentPlayer.call(newTable.currentBet)
         newTable.incrementPot(bet)

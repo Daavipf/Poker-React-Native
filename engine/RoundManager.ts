@@ -1,5 +1,5 @@
 import { gamePhase, gameState } from "@/types/gameState"
-import HandComparator from "./HandComparator"
+import { player } from "@/types/player"
 
 export default class RoundManager {
   static advancePhase(currentPhase: gamePhase): gamePhase {
@@ -21,10 +21,12 @@ export default class RoundManager {
 
   static setUpNewPhase(state: gameState): gameState {
     const newDeck = state.deck.clone()
-    const newTable = state.table.clone()
+    let newTable = state.table.clone()
     let newPlayers = state.players.map((player) => player.clone())
     let newMessage = state.message
     let cards
+
+    newPlayers = this.restartPlayersMove(newPlayers)
 
     switch (state.phase) {
       case "PREFLOP":
@@ -32,29 +34,27 @@ export default class RoundManager {
         newPlayers = newTable.setDealerAndBlinds(newPlayers)
         break
       case "FLOP":
+        newTable.setNextActivePlayerAfterDealer(newPlayers)
         cards = [newDeck.drawCard(), newDeck.drawCard(), newDeck.drawCard()]
         newTable.addCards(cards)
+        newTable.resetCurrentBet()
         break
       case "TURN":
+        newTable.setNextActivePlayerAfterDealer(newPlayers)
         cards = [newDeck.drawCard()]
         newTable.addCards(cards)
+        newTable.resetCurrentBet()
         break
       case "RIVER":
+        newTable.setNextActivePlayerAfterDealer(newPlayers)
         cards = [newDeck.drawCard()]
         newTable.addCards(cards)
+        newTable.resetCurrentBet()
         break
       case "SHOWDOWN":
-        // TODO: implementar logica de side-pot
-        let hands = newPlayers.map((p) => {
-          return [...p.hand, ...newTable.communityCards]
-        })
-        let iWinner = HandComparator.getWinner(hands)
+        let iWinner = newTable.evaluateWinner(newPlayers)
 
-        if (iWinner >= 0 && iWinner < newPlayers.length) {
-          let winner = newPlayers[iWinner]
-          winner.chips += newTable.pot
-          newTable.pot = 0
-        }
+        newTable.distributePot(newPlayers, iWinner)
 
         return RoundManager.restartGame({
           ...state,
@@ -87,16 +87,40 @@ export default class RoundManager {
     newTable.communityCards = []
     newTable.setNextDealer(newPlayers)
 
-    newPlayers = newTable.setPlayersHands(newPlayers, newDeck)
-    newPlayers = newTable.setDealerAndBlinds(newPlayers)
+    let resetPlayers = newPlayers.map((p) => {
+      p.currentBet = 0
+      p.isAllIn = false
+      p.isFold = false
+      p.hasMoved = false
+
+      return p
+    })
+
+    resetPlayers = newTable.setPlayersHands(resetPlayers, newDeck)
+    resetPlayers = newTable.setDealerAndBlinds(resetPlayers)
 
     return {
       ...state,
-      players: newPlayers,
+      players: resetPlayers,
       deck: newDeck,
       table: newTable,
       message: newMessage,
       phase: "PREFLOP",
     }
+  }
+
+  static restartPlayersMove(players: player[]): player[] {
+    const newPlayers = players.map((p, index) => {
+      p.hasMoved = false
+
+      return p
+    })
+
+    return newPlayers
+  }
+
+  static everyPlayerMoved(players: player[]): boolean {
+    let activePlayers = players.filter((p) => !p.isFold)
+    return activePlayers.every((p) => p.hasMoved)
   }
 }

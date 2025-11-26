@@ -9,7 +9,7 @@ export default function Game() {
   const { state, dispatch } = useGame()
   const [loading, setLoading] = useState<boolean>(true)
 
-  const jogadorAtual = state.jogadores[state.indiceJogadorAtivo]
+  const jogadorAtual = state.players[state.table.iCurrentPlayer]
 
   useEffect(() => {
     setLoading(true)
@@ -29,12 +29,13 @@ export default function Game() {
   return (
     <View style={style.container}>
       <View>
-        <Text style={style.center}>Fase: {state.fase}</Text>
-        <Text style={style.center}>Pot: {state.pot}</Text>
-        <Text style={style.center}>Bet Atual: {state.apostaAtual}</Text>
-        {state.fase !== "PREFLOP" && (
+        <Text style={style.center}>Fase: {state.phase}</Text>
+        <Text style={style.center}>Pot: {state.table.pot}</Text>
+        <Text style={style.center}>Bet Atual: {state.table.currentBet}</Text>
+        <Text style={style.center}>{state.message}</Text>
+        {state.phase !== "PREFLOP" && (
           <View style={style.communityCardsContainer}>
-            {state.cartasComunitarias.map((carta) => (
+            {state.table.communityCards.map((carta) => (
               <Text key={carta.id}>{carta.id}</Text>
             ))}
           </View>
@@ -43,14 +44,14 @@ export default function Game() {
 
       {/* 2. Renderiza os Jogadores */}
       <View>
-        {state.jogadores.map((jogador, index) => (
-          <View key={jogador.id}>
-            <Text style={[style.center, jogador.saiu ? style.foldedPlayer : null]}>
-              {jogador.nome} ({jogador.role![0] || "N/A"}) - {jogador.fichas} - {jogador.apostaNaRodada}
+        {state.players.map((jogador, index) => (
+          <View key={index}>
+            <Text style={[style.center, jogador.isFold ? style.foldedPlayer : null]}>
+              {jogador.name} - {jogador.chips} - {jogador.currentBet}
             </Text>
 
             <View style={style.communityCardsContainer}>
-              {jogador.mao.map((carta) => (
+              {jogador.hand.map((carta) => (
                 <Text key={carta.id}>{carta.id}</Text>
               ))}
             </View>
@@ -60,7 +61,7 @@ export default function Game() {
 
       {/* 3. Renderiza as Ações para o jogador ativo */}
       <View>
-        <Text style={style.center}>Turno de: {jogadorAtual.nome}</Text>
+        <Text style={style.center}>Turno de: {jogadorAtual.name}</Text>
 
         {/* Os botões apenas enviam ações. Eles não sabem a lógica. */}
         <Button buttonTitle="Fold" onPress={() => dispatch({ type: "ACAO_JOGADOR", payload: { move: "FOLD" } })} />

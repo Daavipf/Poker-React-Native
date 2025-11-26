@@ -3,6 +3,7 @@ import { deck } from "@/types/deck"
 import { player } from "@/types/player"
 import { table } from "@/types/table"
 import { constants } from "./constants"
+import HandComparator from "./HandComparator"
 
 export default class Table implements table {
   pot: number
@@ -29,8 +30,31 @@ export default class Table implements table {
     this.pot += amount
   }
 
-  setNextPlayer(players: player[]): void {
+  incrementCurrentBet(amount: number): void {
+    this.currentBet += amount
+  }
+
+  resetCurrentBet() {
+    this.currentBet = 0
+  }
+
+  rotateToNextPlayer(players: player[]): void {
     let iNextPlayer = (this.iCurrentPlayer + 1) % players.length
+
+    while (players[iNextPlayer].isFold || players[iNextPlayer].isAllIn) {
+      iNextPlayer = (iNextPlayer + 1) % players.length
+
+      if (iNextPlayer === this.iCurrentPlayer) {
+        this.iCurrentPlayer = iNextPlayer
+        return
+      }
+    }
+
+    this.iCurrentPlayer = iNextPlayer
+  }
+
+  setNextActivePlayerAfterDealer(players: player[]) {
+    let iNextPlayer = (this.iDealer + 1) % players.length
 
     while (players[iNextPlayer].isFold || players[iNextPlayer].isAllIn) {
       iNextPlayer = (iNextPlayer + 1) % players.length
@@ -50,28 +74,47 @@ export default class Table implements table {
     this.iDealer = iNextPlayer
   }
 
-  setNextRaiser(Player: number): void {
-    this.iLastRaiser = Player
+  setNextRaiser(iPlayer: number): void {
+    this.iLastRaiser = iPlayer
   }
 
   setDealerAndBlinds(newPlayers: player[]): player[] {
-    const iDealer = this.iDealer
-    let iSmallBlind = (iDealer + 1) % newPlayers.length
-    let iBigBlind = (iDealer + 2) % newPlayers.length
+    let players = this.resetPlayersRoles(newPlayers)
 
-    newPlayers[iSmallBlind].currentBet = constants.SMALL_BLIND
-    newPlayers[iSmallBlind].chips -= constants.SMALL_BLIND
+    const iDealer = this.iDealer
+    let iSmallBlind = (iDealer + 1) % players.length
+    let iBigBlind = (iDealer + 2) % players.length
+
+    players[iSmallBlind].currentBet = constants.SMALL_BLIND
+    players[iSmallBlind].chips -= constants.SMALL_BLIND
+    players[iSmallBlind].role = "SMALL_BLIND"
     this.incrementPot(constants.SMALL_BLIND)
 
-    newPlayers[iBigBlind].currentBet = constants.BIG_BLIND
-    newPlayers[iBigBlind].chips -= constants.BIG_BLIND
+    players[iBigBlind].currentBet = constants.BIG_BLIND
+    players[iBigBlind].chips -= constants.BIG_BLIND
+    players[iBigBlind].role = "BIG_BLIND"
     this.incrementPot(constants.BIG_BLIND)
 
-    // Assign last raiser
-    this.currentBet = constants.BIG_BLIND
-    this.iLastRaiser = iBigBlind
+    players[iDealer].role = "DEALER"
 
+    this.currentBet = constants.BIG_BLIND
+    this.setNextRaiser(iBigBlind)
+
+    this.assignPlayerUnderTheGun(iBigBlind, players.length)
+
+    return players
+  }
+
+  private resetPlayersRoles(players: player[]): player[] {
+    let newPlayers = [...players]
+    for (let i = 0; i < newPlayers.length; i++) {
+      newPlayers[i].role = undefined
+    }
     return newPlayers
+  }
+
+  private assignPlayerUnderTheGun(iBigBlind: number, playersLength: number) {
+    this.iCurrentPlayer = (iBigBlind + 1) % playersLength
   }
 
   setPlayersHands(newPlayers: player[], deck: deck): player[] {
@@ -80,6 +123,24 @@ export default class Table implements table {
     })
 
     return newPlayers
+  }
+
+  // TODO: implementar logica de side-pot
+  evaluateWinner(players: player[]): number {
+    let hands = players.map((p) => {
+      return [...p.hand, ...this.communityCards]
+    })
+    let iWinner = HandComparator.getWinner(hands)
+
+    return iWinner
+  }
+
+  distributePot(players: player[], iWinner: number): void {
+    if (iWinner >= 0 && iWinner < players.length) {
+      let winner = players[iWinner]
+      winner.chips += this.pot
+      this.pot = 0
+    }
   }
 
   clone(): table {

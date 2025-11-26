@@ -42,27 +42,27 @@ describe("Table Tests", () => {
   ]
 
   it("should set the next player correctly", () => {
-    table.setNextPlayer(players)
+    table.rotateToNextPlayer(players)
     expect(table.iCurrentPlayer).toBe(1)
   })
 
   it("should go around the table players correctly", () => {
-    table.setNextPlayer(players)
-    table.setNextPlayer(players)
-    table.setNextPlayer(players)
-    table.setNextPlayer(players)
+    table.rotateToNextPlayer(players)
+    table.rotateToNextPlayer(players)
+    table.rotateToNextPlayer(players)
+    table.rotateToNextPlayer(players)
     expect(table.iCurrentPlayer).toBe(1)
   })
 
   it("should account for folded players correctly", () => {
     players[1].fold()
-    table.setNextPlayer(players)
+    table.rotateToNextPlayer(players)
     expect(table.iCurrentPlayer).toBe(2)
   })
 
   it("should account for all-in players correctly", () => {
     players[1].allIn()
-    table.setNextPlayer(players)
+    table.rotateToNextPlayer(players)
     expect(table.iCurrentPlayer).toBe(2)
   })
 

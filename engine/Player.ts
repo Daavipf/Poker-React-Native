@@ -8,8 +8,10 @@ export default class Player implements player {
   currentBet: number
   hand: card[]
   type: "JOGADOR" | "IA"
+  role: "DEALER" | "SMALL_BLIND" | "BIG_BLIND" | undefined
   isFold: boolean
   isAllIn: boolean
+  hasMoved: boolean
 
   constructor(name: string, chips: number, type: "JOGADOR" | "IA") {
     this.name = name
@@ -19,6 +21,7 @@ export default class Player implements player {
     this.type = type
     this.isFold = false
     this.isAllIn = false
+    this.hasMoved = false
   }
 
   setHand(cards: card[]): void {
@@ -28,12 +31,14 @@ export default class Player implements player {
   fold(): void {
     this.isFold = true
     this.hand = []
+    this.hasMoved = true
   }
 
   allIn(): number {
     this.isAllIn = true
     const allInChips = this.chips
     this.chips = 0
+    this.hasMoved = true
     return allInChips
   }
 
@@ -47,6 +52,7 @@ export default class Player implements player {
 
     this.chips -= realBetValue
     this.currentBet += realBetValue
+    this.hasMoved = true
 
     return realBetValue
   }
@@ -61,12 +67,14 @@ export default class Player implements player {
 
     this.chips -= realBetValue
     this.currentBet = amount
+    this.hasMoved = true
 
     return realBetValue
   }
 
-  check(currentBet: number): void {
-    if (this.currentBet !== currentBet) throw new Error("CHECK inválido: Aposta não coberta.")
+  check(tableCurrentBet: number): void {
+    if (this.currentBet < tableCurrentBet) throw new Error("CHECK inválido: Aposta não coberta.")
+    this.hasMoved = true
   }
 
   clone(): player {
@@ -74,7 +82,9 @@ export default class Player implements player {
     newPlayer.hand = [...this.hand]
     newPlayer.isFold = this.isFold
     newPlayer.isAllIn = this.isAllIn
+    newPlayer.hasMoved = this.hasMoved
     newPlayer.currentBet = this.currentBet
+    newPlayer.role = this.role
     return newPlayer
   }
 }

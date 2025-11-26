@@ -6,8 +6,10 @@ export interface player {
   currentBet: number
   hand: card[]
   type: "JOGADOR" | "IA"
+  role: "DEALER" | "SMALL_BLIND" | "BIG_BLIND" | undefined
   isFold: boolean
   isAllIn: boolean
+  hasMoved: boolean
   setHand: (cards: card[]) => void
   fold: () => void
   allIn: () => number

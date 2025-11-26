@@ -1,4 +1,5 @@
 import { gameState } from "@/types/gameState"
+import { player } from "@/types/player"
 import RoundManager from "./RoundManager"
 
 export interface action {
@@ -7,71 +8,95 @@ export interface action {
 }
 
 export function gameReducer(state: gameState, action: action): gameState {
-  const newDeck = state.deck.clone()
-  const newTable = state.table.clone()
-  let newPlayers = state.players.map((player) => player.clone())
-  let newMessage = state.message
+  let newState = { ...state }
 
   switch (action.type) {
     case "INICIAR_RODADA":
-      return RoundManager.setUpNewPhase(state)
+      newState = RoundManager.setUpNewPhase(newState)
+      break
     case "ACAO_JOGADOR":
-      const { move, amount } = action.payload!
-      const iCurrentPlayer = newTable.iCurrentPlayer
-      const currentPlayer = newPlayers[iCurrentPlayer]
+      const { amount, move } = action.payload!
 
-      if (move === "FOLD") {
-        currentPlayer.fold()
-        newTable.setNextPlayer(newPlayers)
+      switch (move) {
+        case "FOLD":
+          newState.players[newState.table.iCurrentPlayer].fold()
+          newState.message = `${newState.players[newState.table.iCurrentPlayer].name} saiu.`
 
-        let players = newPlayers.filter((p) => !p.isFold)
-        if (players.length === 1) {
-          let iLastSurvivor = newPlayers.findIndex((p) => !p.isFold)
-          newPlayers[iLastSurvivor].chips += newTable.pot
-          newTable.pot = 0
-          return RoundManager.restartGame({ ...state, players: newPlayers })
-        }
-      } else if (move === "CALL") {
-        const bet = currentPlayer.call(newTable.currentBet)
-        newTable.incrementPot(bet)
-        newTable.setNextPlayer(newPlayers)
-      } else if (move === "RAISE") {
-        const bet = currentPlayer.raise(newTable.currentBet)
-        newTable.incrementPot(bet)
-        newTable.iLastRaiser = iCurrentPlayer
-        newTable.currentBet = bet
-        newTable.setNextPlayer(newPlayers)
-      } else if (move === "CHECK") {
-        if (currentPlayer.currentBet < newTable.currentBet) {
-          newMessage = "CHECK inválido: Aposta não coberta."
-          return { ...state, message: newMessage }
-        }
-        newTable.setNextPlayer(newPlayers)
-      } else {
-        newMessage = "Ação não reconhecida"
-        return { ...state, message: newMessage }
+          const iWinner = getWinnerByFolds(newState.players)
+          if (iWinner !== -1) {
+            newState.table.distributePot(newState.players, iWinner)
+            newState = RoundManager.restartGame(newState)
+
+            return newState
+          }
+
+          newState.table.rotateToNextPlayer(newState.players)
+
+          break
+        case "CALL":
+          let bet = newState.players[newState.table.iCurrentPlayer].call(newState.table.currentBet)
+          newState.table.incrementPot(bet)
+
+          newState.message = `${newState.players[newState.table.iCurrentPlayer].name} pagou a aposta.`
+
+          newState.table.rotateToNextPlayer(newState.players)
+
+          break
+        case "CHECK":
+          try {
+            newState.players[newState.table.iCurrentPlayer].check(newState.table.currentBet)
+
+            newState.table.rotateToNextPlayer(newState.players)
+          } catch (error: any) {
+            newState.message = error.message
+
+            return newState
+          }
+
+          break
+        case "RAISE":
+          let raiseBet = newState.players[newState.table.iCurrentPlayer].raise(amount!)
+          newState.table.incrementPot(raiseBet)
+          newState.table.incrementCurrentBet(amount!)
+
+          newState.message = `${newState.players[newState.table.iCurrentPlayer].name} aumentou a aposta.`
+
+          newState.players = RoundManager.restartPlayersMove(newState.players)
+          newState.players[newState.table.iCurrentPlayer].hasMoved = true
+
+          newState.table.setNextRaiser(newState.table.iCurrentPlayer)
+          newState.table.rotateToNextPlayer(newState.players)
+
+          break
       }
-
-      let lastRaiserPlayer = newPlayers[newTable.iLastRaiser]
-      let newPhase = state.phase
-      let newState = {
-        ...state,
-        deck: newDeck,
-        table: newTable,
-        players: newPlayers,
-        message: newMessage,
-        phase: newPhase,
-      }
-
-      if (lastRaiserPlayer.name === currentPlayer.name) {
-        newPhase = RoundManager.advancePhase(state.phase)
-        newState = RoundManager.setUpNewPhase({ ...newState, phase: newPhase })
-      }
-
-      return newState
+      break
     case "AVANCAR_FASE":
-      return state
+      newState = RoundManager.setUpNewPhase(newState)
+      break
     default:
-      return state
+      break
   }
+
+  if (RoundManager.everyPlayerMoved(newState.players)) {
+    newState.phase = RoundManager.advancePhase(newState.phase)
+    newState = RoundManager.setUpNewPhase(newState)
+  }
+
+  return newState
+}
+
+function getWinnerByFolds(players: player[]): number {
+  const activePLayersIndexes: number[] = []
+
+  for (let i = 0; i < players.length; i++) {
+    if (!players[i].isFold) {
+      activePLayersIndexes.push(i)
+    }
+  }
+
+  if (activePLayersIndexes.length === 1) {
+    return activePLayersIndexes[0]
+  }
+
+  return -1
 }

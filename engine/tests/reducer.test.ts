@@ -4,12 +4,13 @@ import Player from "../Player"
 import Table from "../Table"
 import { action, gameReducer } from "../gameReducer"
 
-const initialState: gameState = {
+const defaultState: gameState = {
   deck: new Deck(),
   players: [
-    new Player("Jogador 1", 100, "JOGADOR"),
-    new Player("Jogador 2", 100, "IA"),
-    new Player("Jogador 3", 100, "IA"),
+    new Player("Jogador 1", 1000, "JOGADOR"),
+    new Player("Jogador 2", 1000, "IA"),
+    new Player("Jogador 3", 1000, "IA"),
+    new Player("Jogador 4", 1000, "IA"),
   ],
   phase: "PREFLOP",
   table: new Table(),
@@ -18,233 +19,347 @@ const initialState: gameState = {
 
 const foldAction: action = { type: "ACAO_JOGADOR", payload: { move: "FOLD" } }
 const callAction: action = { type: "ACAO_JOGADOR", payload: { move: "CALL" } }
-const raiseAction: action = { type: "ACAO_JOGADOR", payload: { move: "RAISE" } }
+const raiseAction: action = { type: "ACAO_JOGADOR", payload: { move: "RAISE", amount: 50 } }
 const checkAction: action = { type: "ACAO_JOGADOR", payload: { move: "CHECK" } }
 const NUM_PLAYER_CARDS = 2
 
-describe("gameReducer", () => {
-  it("should start the round correctly", () => {
-    const newState = gameReducer(initialState, { type: "INICIAR_RODADA" })
+describe("Initialization Tests", () => {
+  const state = gameReducer(defaultState, { type: "INICIAR_RODADA" })
 
-    expect(newState.phase).toBe("PREFLOP")
-    expect(newState.table.pot).toBe(75)
-
-    expect(newState.players[0].hand.length).toBe(NUM_PLAYER_CARDS)
-    expect(newState.players[1].hand.length).toBe(NUM_PLAYER_CARDS)
-    expect(newState.players[2].hand.length).toBe(NUM_PLAYER_CARDS)
-
-    expect(newState.table.iCurrentPlayer).toBe(0)
-    expect(newState.table.iDealer).toBe(0)
-
-    let iBigBlind = (newState.table.iDealer + 2) % newState.players.length
-    expect(newState.players[iBigBlind].currentBet).toBe(50)
-
-    let iSmallBlind = (newState.table.iDealer + 1) % newState.players.length
-    expect(newState.players[iSmallBlind].currentBet).toBe(25)
-
-    expect(newState.table.iLastRaiser).toBe(iBigBlind)
-    expect(newState.table.communityCards.length).toBe(0)
-    expect(newState.table.currentBet).toBe(50)
+  it("Phase", () => {
+    expect(state.phase).toBe("PREFLOP")
   })
 
-  it("should process FOLD correctly", () => {
-    let newState: gameState = gameReducer(initialState, { type: "INICIAR_RODADA" })
-    newState = gameReducer(newState, foldAction)
-
-    expect(newState.players[0].isFold).toBe(true)
-    expect(newState.players[0].hand.length).toBe(0)
-    expect(newState.table.iCurrentPlayer).toBe(1)
+  it("Pot", () => {
+    expect(state.table.pot).toBe(75)
   })
 
-  it("should process CALL correctly", () => {
-    let newState: gameState = gameReducer(initialState, { type: "INICIAR_RODADA" })
-    newState = gameReducer(newState, callAction)
-
-    expect(newState.players[0].currentBet).toBe(50)
-  })
-
-  it("should process RAISE correctly", () => {
-    let newState: gameState = gameReducer(initialState, { type: "INICIAR_RODADA" })
-    expect(newState.table.pot).toBe(75)
-    expect(newState.table.currentBet).toBe(50)
-    expect(newState.players[0].currentBet).toBe(0)
-    newState = gameReducer(newState, raiseAction)
-
-    expect(newState.players[0].currentBet).toBe(100)
-    expect(newState.table.pot).toBe(175)
-    expect(newState.table.currentBet).toBe(100)
-    expect(newState.table.iLastRaiser).toBe(0)
-    expect(newState.table.iCurrentPlayer).toBe(1)
-  })
-
-  it("should process CHECK correctly", () => {
-    let newState: gameState = gameReducer(initialState, { type: "INICIAR_RODADA" })
-    newState = gameReducer(newState, callAction)
-    newState = gameReducer(newState, callAction)
-    newState = gameReducer(newState, checkAction)
-    expect(newState.players[2].currentBet).toBe(50)
-    expect(newState.table.iCurrentPlayer).toBe(0)
-    expect(newState.table.currentBet).toBe(50)
-    expect(newState.table.iLastRaiser).toBe(2)
-    expect(newState.table.pot).toBe(150)
-  })
-
-  it("should validate CHECK correctly", () => {
-    let newState: gameState = gameReducer(initialState, { type: "INICIAR_RODADA" })
-    expect(newState.message).toBe("")
-    newState = gameReducer(newState, checkAction)
-    expect(newState.table.iCurrentPlayer).toBe(0)
-    expect(newState.message).toBe("CHECK inválido: Aposta não coberta.")
-  })
-
-  it("should turn phase correctly", () => {
-    let newState: gameState = gameReducer(initialState, { type: "INICIAR_RODADA" })
-    newState = gameReducer(newState, callAction)
-    newState = gameReducer(newState, callAction)
-    newState = gameReducer(newState, checkAction)
-
-    expect(newState.table.iCurrentPlayer).toBe(0)
-    expect(newState.phase).toBe("FLOP")
-  })
-
-  it("should reach FLOP phase correctly", () => {
-    let newState: gameState = gameReducer(initialState, { type: "INICIAR_RODADA" })
-    newState = gameReducer(newState, callAction)
-    newState = gameReducer(newState, callAction)
-    newState = gameReducer(newState, checkAction)
-
-    expect(newState.table.iCurrentPlayer).toBe(0)
-    expect(newState.phase).toBe("FLOP")
-    expect(newState.table.communityCards.length).toBe(3)
-  })
-
-  it("should reach TURN phase correctly", () => {
-    let newState: gameState = gameReducer(initialState, { type: "INICIAR_RODADA" })
-    newState = gameReducer(newState, callAction)
-    newState = gameReducer(newState, callAction)
-    for (let i = 0; i < 4; i++) {
-      newState = gameReducer(newState, checkAction)
+  it("Players hands", () => {
+    for (let i = 0; i < state.players.length; i++) {
+      expect(state.players[i].hand.length).toBe(NUM_PLAYER_CARDS)
     }
-
-    expect(newState.table.iCurrentPlayer).toBe(0)
-    expect(newState.phase).toBe("TURN")
-    expect(newState.table.communityCards.length).toBe(4)
   })
 
-  it("should reach RIVER phase correctly", () => {
-    let newState: gameState = gameReducer(initialState, { type: "INICIAR_RODADA" })
-    newState = gameReducer(newState, callAction)
-    newState = gameReducer(newState, callAction)
-    for (let i = 0; i < 7; i++) {
-      newState = gameReducer(newState, checkAction)
+  it("Players move flag", () => {
+    for (let i = 0; i < state.players.length; i++) {
+      expect(state.players[i].hasMoved).toBe(false)
     }
-
-    expect(newState.table.iCurrentPlayer).toBe(0)
-    expect(newState.phase).toBe("RIVER")
-    expect(newState.table.communityCards.length).toBe(5)
   })
 
-  // it("should reach SHOWDOWN phase correctly", () => {
-  //   let newState: gameState = gameReducer(initialState, { type: "INICIAR_RODADA" })
-  //   newState = gameReducer(newState, callAction)
-  //   newState = gameReducer(newState, callAction)
-  //   for (let i = 0; i < 10; i++) {
-  //     newState = gameReducer(newState, checkAction)
-  //   }
-
-  //   expect(newState.table.iCurrentPlayer).toBe(0)
-  //   expect(newState.phase).toBe("SHOWDOWN")
-  //   expect(newState.table.communityCards.length).toBe(5)
-  // })
-
-  it("should process this run correctly", () => {
-    let newState: gameState = gameReducer(initialState, { type: "INICIAR_RODADA" })
-    newState = gameReducer(newState, callAction) // Jogador
-    newState = gameReducer(newState, foldAction) // IA 1
-
-    expect(newState.table.iCurrentPlayer).toBe(2)
-    expect(newState.phase).toBe("PREFLOP")
-
-    newState = gameReducer(newState, checkAction) // IA 2
-
-    expect(newState.table.iCurrentPlayer).toBe(0)
-    expect(newState.phase).toBe("FLOP")
+  it("Dealer index", () => {
+    let iDealer = state.table.iDealer
+    expect(iDealer).toBe(0)
+    expect(state.players[iDealer].role).toBe("DEALER")
   })
 
-  it("sould get the winner correctly", () => {
-    const players: Player[] = [
-      new Player("Jogador 1", 100, "JOGADOR"),
-      new Player("Jogador 2", 100, "IA"),
-      new Player("Jogador 3", 100, "IA"),
-    ]
+  it("Raiser index", () => {
+    expect(state.table.iLastRaiser).toBe(2)
+  })
 
-    const hands = [
-      [
-        { id: "10C", valor: "10", naipe: "C", peso: 10 },
-        { id: "JC", valor: "J", naipe: "C", peso: 11 },
-      ],
-      [
-        { id: "3O", valor: "3", naipe: "O", peso: 3 },
-        { id: "KC", valor: "K", naipe: "C", peso: 13 },
-      ],
-      [
-        { id: "9C", valor: "9", naipe: "C", peso: 9 },
-        { id: "8C", valor: "8", naipe: "C", peso: 8 },
-      ],
-    ]
+  it("Current player index", () => {
+    expect(state.table.iCurrentPlayer).toBe(3)
+  })
 
-    for (let i = 0; i < 3; i++) {
-      players[i].setHand(hands[i])
-    }
-
-    const communityCards = [
-      { id: "10O", valor: "10", naipe: "O", peso: 10 },
-      { id: "10E", valor: "10", naipe: "E", peso: 10 },
-      { id: "JP", valor: "J", naipe: "P", peso: 11 },
-      { id: "3C", valor: "3", naipe: "C", peso: 3 },
-      { id: "4O", valor: "4", naipe: "O", peso: 4 },
-    ]
-
-    const table = new Table()
-    table.addCards(communityCards)
-    table.incrementPot(500)
-
-    const state: gameState = {
+  it("Current player index with 3 players", () => {
+    const defaultState: gameState = {
       deck: new Deck(),
-      players,
-      phase: "RIVER",
-      table,
+      players: [
+        new Player("Jogador 1", 1000, "JOGADOR"),
+        new Player("Jogador 2", 1000, "IA"),
+        new Player("Jogador 3", 1000, "IA"),
+      ],
+      phase: "PREFLOP",
+      table: new Table(),
       message: "",
     }
 
-    let newState: gameState = gameReducer(state, checkAction)
-    newState = gameReducer(newState, checkAction)
-
-    // OBS: nova rodada iniciada
-    expect(newState.phase).toBe("PREFLOP")
-    expect(newState.table.pot).toBe(75)
-    expect(newState.players[0].chips).toBe(550)
+    const state = gameReducer(defaultState, { type: "INICIAR_RODADA" })
+    expect(state.table.iCurrentPlayer).toBe(0)
   })
 
-  it("should get the last survivor corretly", () => {
-    let newState: gameState = gameReducer(initialState, { type: "INICIAR_RODADA" })
-    newState = gameReducer(newState, foldAction) // Jogador
-    newState = gameReducer(newState, foldAction) // IA 1
+  it("Current player index with 2 players", () => {
+    const defaultState: gameState = {
+      deck: new Deck(),
+      players: [new Player("Jogador 1", 1000, "JOGADOR"), new Player("Jogador 2", 1000, "IA")],
+      phase: "PREFLOP",
+      table: new Table(),
+      message: "",
+    }
+    const state = gameReducer(defaultState, { type: "INICIAR_RODADA" })
 
-    expect(newState.table.iCurrentPlayer).toBe(1)
-    expect(newState.phase).toBe("PREFLOP")
-    expect(newState.players[2].chips).toBe(100)
+    expect(state.table.iCurrentPlayer).toBe(1)
   })
 
-  it("should restart the game corretly", () => {
-    let newState: gameState = gameReducer(initialState, { type: "INICIAR_RODADA" })
-    newState = gameReducer(newState, callAction)
-    newState = gameReducer(newState, callAction)
-    for (let i = 0; i < 10; i++) {
-      newState = gameReducer(newState, checkAction)
+  it("Big blind", () => {
+    let iBigBlind = (state.table.iDealer + 2) % state.players.length
+    expect(iBigBlind).toBe(2)
+    expect(state.players[iBigBlind].currentBet).toBe(50)
+    expect(state.players[iBigBlind].chips).toBe(950)
+    expect(state.players[iBigBlind].role).toBe("BIG_BLIND")
+  })
+
+  it("Small blind", () => {
+    let iSmallBlind = (state.table.iDealer + 1) % state.players.length
+    expect(iSmallBlind).toBe(1)
+    expect(state.players[iSmallBlind].currentBet).toBe(25)
+    expect(state.players[iSmallBlind].chips).toBe(975)
+    expect(state.players[iSmallBlind].role).toBe("SMALL_BLIND")
+  })
+
+  // TODO: Blind tests with different numbers of players
+
+  it("Table current bet", () => {
+    expect(state.table.currentBet).toBe(50)
+  })
+
+  it("Community Cards", () => {
+    expect(state.table.communityCards.length).toBe(0)
+  })
+})
+
+describe("Player actions", () => {
+  let state: gameState
+
+  beforeEach(() => {
+    state = gameReducer(defaultState, { type: "INICIAR_RODADA" })
+  })
+
+  it("CALL", () => {
+    state = gameReducer(state, callAction)
+    expect(state.table.pot).toBe(125)
+  })
+
+  it("FOLD", () => {
+    state = gameReducer(state, foldAction)
+    expect(state.table.pot).toBe(75)
+    expect(state.players[3].isFold).toBe(true)
+  })
+
+  it("RAISE", () => {
+    state = gameReducer(state, raiseAction)
+    expect(state.table.pot).toBe(175)
+    expect(state.table.currentBet).toBe(100)
+    expect(state.table.iLastRaiser).toBe(3)
+  })
+
+  it("CHECK", () => {
+    state = gameReducer(state, callAction) //IA 3
+    state = gameReducer(state, callAction) //Jogador
+    state = gameReducer(state, callAction) //IA 1
+    state = gameReducer(state, checkAction) //IA 2 (Big Blind)
+    expect(state.table.pot).toBe(200)
+  })
+
+  it("Invalid CHECK", () => {
+    state = gameReducer(state, checkAction)
+    expect(state.table.pot).toBe(75)
+    expect(state.message).toBe("CHECK inválido: Aposta não coberta.")
+  })
+
+  //TODO: All-in tests
+})
+
+describe("Game Flow", () => {
+  let state: gameState
+
+  beforeEach(() => {
+    state = gameReducer(defaultState, { type: "INICIAR_RODADA" })
+  })
+
+  it("Set Next Player", () => {
+    expect(state.table.iCurrentPlayer).toBe(3)
+    state = gameReducer(state, callAction)
+    expect(state.table.iCurrentPlayer).toBe(0)
+  })
+
+  it("Reach FLOP", () => {
+    expect(state.phase).toBe("PREFLOP")
+    for (let i = 0; i < 4; i++) {
+      state = gameReducer(state, callAction)
     }
 
-    expect(newState.phase).toBe("PREFLOP")
-    expect(newState.table.pot).toBe(75)
+    expect(state.phase).toBe("FLOP")
+  })
+
+  it("Correct FLOP cards amount", () => {
+    expect(state.phase).toBe("PREFLOP")
+    for (let i = 0; i < 4; i++) {
+      state = gameReducer(state, callAction)
+    }
+
+    expect(state.table.communityCards.length).toBe(3)
+    for (let j = 0; j < state.players.length; j++) {
+      expect(state.players[j].hand.length).toBe(2)
+    }
+  })
+
+  it("Reach TURN", () => {
+    expect(state.phase).toBe("PREFLOP")
+    for (let i = 0; i < 8; i++) {
+      state = gameReducer(state, callAction)
+    }
+
+    expect(state.phase).toBe("TURN")
+  })
+
+  it("Correct TURN cards amount", () => {
+    expect(state.phase).toBe("PREFLOP")
+    for (let i = 0; i < 8; i++) {
+      state = gameReducer(state, callAction)
+    }
+
+    expect(state.table.communityCards.length).toBe(4)
+    for (let j = 0; j < state.players.length; j++) {
+      expect(state.players[j].hand.length).toBe(2)
+    }
+  })
+
+  it("Reach RIVER", () => {
+    expect(state.phase).toBe("PREFLOP")
+    for (let i = 0; i < 12; i++) {
+      state = gameReducer(state, callAction)
+    }
+
+    expect(state.phase).toBe("RIVER")
+  })
+
+  it("Correct RIVER cards amount", () => {
+    expect(state.phase).toBe("PREFLOP")
+    for (let i = 0; i < 12; i++) {
+      state = gameReducer(state, callAction)
+    }
+
+    expect(state.table.communityCards.length).toBe(5)
+    for (let j = 0; j < state.players.length; j++) {
+      expect(state.players[j].hand.length).toBe(2)
+    }
+  })
+
+  it("Restart Game", () => {
+    expect(state.phase).toBe("PREFLOP")
+    for (let i = 0; i < 16; i++) {
+      state = gameReducer(state, callAction)
+    }
+
+    //Aqui a fase de showdown já foi processada e o pot distribuído automaticamente
+    expect(state.phase).toBe("PREFLOP")
+  })
+
+  it("New round blind rules correctly", () => {
+    expect(state.phase).toBe("PREFLOP")
+    for (let i = 0; i < 16; i++) {
+      state = gameReducer(state, callAction)
+    }
+
+    expect(state.table.iCurrentPlayer).toBe(0)
+    expect(state.players[0].role).toBe(undefined)
+    expect(state.table.iDealer).toBe(1)
+    expect(state.players[1].role).toBe("DEALER")
+    let iBigBlind = (state.table.iDealer + 2) % state.players.length
+    expect(iBigBlind).toBe(3)
+    expect(state.table.iLastRaiser).toBe(iBigBlind)
+    expect(state.players[iBigBlind].role).toBe("BIG_BLIND")
+    let iSmallBlind = (state.table.iDealer + 1) % state.players.length
+    expect(iSmallBlind).toBe(2)
+    expect(state.players[iSmallBlind].role).toBe("SMALL_BLIND")
+  })
+})
+
+describe("Real Game Simulations", () => {
+  let state: gameState
+
+  beforeEach(() => {
+    state = gameReducer(defaultState, { type: "INICIAR_RODADA" })
+  })
+
+  it("Scenario: The Walk (Everyone folds to Big Blind)", () => {
+    // Ordem: UTG (P3) -> Dealer (P0) -> SB (P1) -> BB (P2)
+
+    // P3 Folds
+    state = gameReducer(state, foldAction)
+    expect(state.table.iCurrentPlayer).toBe(0)
+
+    // P0 Folds
+    state = gameReducer(state, foldAction)
+    expect(state.table.iCurrentPlayer).toBe(1)
+
+    // P1 (Small Blind) Folds
+    state = gameReducer(state, foldAction)
+
+    // O jogo deve detectar vitória automática do BB e reiniciar
+    // Dependendo da implementação, pode ir para "PREFLOP" direto (novo jogo) ou "SHOWDOWN"
+    // Baseado nos testes anteriores, ele reinicia para PREFLOP
+    expect(state.phase).toBe("PREFLOP")
+
+    // O Dealer deve ter mudado
+    expect(state.table.iDealer).toBe(1)
+
+    // O jogador 2 (Antigo BB) deve ter ganho as fichas do SB (25) + as suas de volta
+    // Stack inicial 1000. Pagou 50 (950). Ganhou 75. Final: 1025.
+    expect(state.players[2].chips).toBe(1000)
+    expect(state.players[2].role).toBe("SMALL_BLIND")
+  })
+
+  it("Scenario: Pre-flop Aggression (Raise and Calls)", () => {
+    // P3 (UTG) aumenta para 100
+    state = gameReducer(state, raiseAction) // Aumenta 50 sobre o BB (50) = 100 total
+    expect(state.table.currentBet).toBe(100)
+    expect(state.table.pot).toBe(175) // 25(SB) + 50(BB) + 100(UTG)
+    expect(state.table.iLastRaiser).toBe(3)
+
+    // P0 (Dealer) paga 100
+    state = gameReducer(state, callAction)
+    expect(state.table.pot).toBe(275) // +100
+
+    // P1 (SB) folda
+    state = gameReducer(state, foldAction)
+    expect(state.players[1].isFold).toBe(true)
+
+    // P2 (BB) paga a diferença (já pôs 50, põe mais 50)
+    state = gameReducer(state, callAction)
+
+    // Agora todos agiram e igualaram a aposta. Deve ir para FLOP.
+    expect(state.phase).toBe("FLOP")
+    expect(state.table.pot).toBe(325) // 275 + 50
+    expect(state.table.communityCards.length).toBe(3)
+  })
+
+  it("Scenario: Flop Betting (Check, Bet, Call)", () => {
+    // Setup: Chegar ao FLOP com todos pagando (Limp pot)
+    state = gameReducer(state, callAction) // P3 call
+    state = gameReducer(state, callAction) // P0 call
+    state = gameReducer(state, callAction) // P1 call
+    state = gameReducer(state, checkAction) // P2 check (BB option)
+
+    expect(state.phase).toBe("FLOP")
+
+    // Ordem pós-flop começa pelo SB (P1)
+    expect(state.table.iCurrentPlayer).toBe(1)
+
+    // P1 Checks
+    state = gameReducer(state, checkAction)
+
+    // P2 Checks
+    state = gameReducer(state, checkAction)
+
+    // P3 Aposta (Raise/Bet)
+    state = gameReducer(state, raiseAction)
+    // Assumindo raiseAction amount=50. Pot era 200. Agora 250.
+    expect(state.table.currentBet).toBe(50)
+    expect(state.table.iLastRaiser).toBe(3)
+
+    // P0 Folds
+    state = gameReducer(state, foldAction)
+
+    // P1 (que deu check antes) agora tem que Pagar ou Foldar. Paga.
+    state = gameReducer(state, callAction)
+
+    // P2 Folds
+    state = gameReducer(state, foldAction)
+
+    // A rodada de apostas acabou? P3 apostou, P1 pagou.
+    // Se P3 foi o agressor e P1 fechou a ação, deve ir para TURN.
+    expect(state.phase).toBe("TURN")
+    expect(state.table.communityCards.length).toBe(4)
   })
 })

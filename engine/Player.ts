@@ -1,6 +1,5 @@
 import { card } from "@/types/card"
 import { player } from "@/types/player"
-import { constants } from "./constants"
 
 export default class Player implements player {
   name: string
@@ -42,8 +41,8 @@ export default class Player implements player {
     return allInChips
   }
 
-  raise(currentBet: number): number {
-    let realBetValue = currentBet + constants.RAISE_VALUE
+  raise(tableCurrentBet: number, amount: number): number {
+    let realBetValue = tableCurrentBet + amount + this.currentBet
     if (this.chips <= realBetValue) {
       const allInBet = this.allIn()
       this.currentBet += allInBet

@@ -1,8 +1,8 @@
-import { iplayer } from "@/types/iplayer"
+import { player } from "@/types/player"
 import Player from "../Player"
 
 describe("Player Tests", () => {
-  let player: iplayer
+  let player: player
 
   beforeEach(() => {
     player = new Player("Jogador", 100, "JOGADOR")
@@ -42,7 +42,7 @@ describe("Player Tests", () => {
   })
 
   it("should process RAISE correctly", () => {
-    let playerBet = player.raise(25)
+    let playerBet = player.raise(25, 50)
     expect(playerBet).toBe(75)
     expect(player.chips).toBe(25)
     expect(player.currentBet).toBe(75)

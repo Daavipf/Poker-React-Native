@@ -13,7 +13,7 @@ export interface player {
   setHand: (cards: card[]) => void
   fold: () => void
   allIn: () => number
-  raise: (currentBet: number) => number
+  raise: (tableCurrentBet: number, amount: number) => number
   call: (amount: number) => number
   check: (currentBet: number) => void
   clone: () => player

@@ -1,5 +1,5 @@
 import { card } from "@/types/card"
-import HandEvaluator, { result } from "../HandEvaluator"
+import HandEvaluator, { handResult } from "../HandEvaluator"
 
 describe("HandEvaluator Tests", () => {
   // 10. Royal Flush
@@ -15,7 +15,7 @@ describe("HandEvaluator Tests", () => {
       { id: "2O", valor: "2", naipe: "O", peso: 2 }, // Lixo
     ]
 
-    const result: result = HandEvaluator.evaluateHand(hand)
+    const result: handResult = HandEvaluator.evaluateHand(hand)
 
     expect(result.nivel).toBe(10)
     expect(result.nome).toBe("Royal Flush")
@@ -34,7 +34,7 @@ describe("HandEvaluator Tests", () => {
       { id: "KO", valor: "K", naipe: "O", peso: 13 }, // Lixo
     ]
 
-    const result: result = HandEvaluator.evaluateHand(hand)
+    const result: handResult = HandEvaluator.evaluateHand(hand)
 
     expect(result.nivel).toBe(9)
     expect(result.nome).toBe("Straight Flush")
@@ -53,7 +53,7 @@ describe("HandEvaluator Tests", () => {
       { id: "3E", valor: "3", naipe: "E", peso: 3 },
     ]
 
-    const result: result = HandEvaluator.evaluateHand(hand)
+    const result: handResult = HandEvaluator.evaluateHand(hand)
 
     expect(result.nivel).toBe(8)
     expect(result.nome).toBe("Four of a Kind")
@@ -72,7 +72,7 @@ describe("HandEvaluator Tests", () => {
       { id: "4P", valor: "4", naipe: "P", peso: 4 },
     ]
 
-    const result: result = HandEvaluator.evaluateHand(hand)
+    const result: handResult = HandEvaluator.evaluateHand(hand)
 
     expect(result.nivel).toBe(7)
     expect(result.nome).toBe("Full House")
@@ -91,7 +91,7 @@ describe("HandEvaluator Tests", () => {
       { id: "5C", valor: "5", naipe: "C", peso: 5 }, // Naipe diferente
     ]
 
-    const result: result = HandEvaluator.evaluateHand(hand)
+    const result: handResult = HandEvaluator.evaluateHand(hand)
 
     expect(result.nivel).toBe(6)
     expect(result.nome).toBe("Flush")
@@ -110,7 +110,7 @@ describe("HandEvaluator Tests", () => {
       { id: "JC", valor: "J", naipe: "E", peso: 11 },
     ]
 
-    const result: result = HandEvaluator.evaluateHand(hand)
+    const result: handResult = HandEvaluator.evaluateHand(hand)
 
     expect(result.nivel).toBe(5)
     expect(result.nome).toBe("Straight")
@@ -129,7 +129,7 @@ describe("HandEvaluator Tests", () => {
       { id: "2C", valor: "2", naipe: "E", peso: 2 },
     ]
 
-    const result: result = HandEvaluator.evaluateHand(hand)
+    const result: handResult = HandEvaluator.evaluateHand(hand)
 
     expect(result.nivel).toBe(5)
     expect(result.nome).toBe("Straight")
@@ -147,7 +147,7 @@ describe("HandEvaluator Tests", () => {
       { id: "3C", valor: "3", naipe: "E", peso: 3 },
     ]
 
-    const result: result = HandEvaluator.evaluateHand(hand)
+    const result: handResult = HandEvaluator.evaluateHand(hand)
 
     expect(result.nivel).toBe(5)
     expect(result.nome).toBe("Straight")
@@ -167,7 +167,7 @@ describe("HandEvaluator Tests", () => {
       { id: "2O", valor: "2", naipe: "O", peso: 2 },
     ]
 
-    const result: result = HandEvaluator.evaluateHand(hand)
+    const result: handResult = HandEvaluator.evaluateHand(hand)
 
     expect(result.nivel).toBe(4)
     expect(result.nome).toBe("Three of a Kind")
@@ -186,7 +186,7 @@ describe("HandEvaluator Tests", () => {
       { id: "9O", valor: "9", naipe: "O", peso: 9 },
     ]
 
-    const result: result = HandEvaluator.evaluateHand(hand)
+    const result: handResult = HandEvaluator.evaluateHand(hand)
 
     expect(result.nivel).toBe(3)
     expect(result.nome).toBe("Two Pair")
@@ -205,7 +205,7 @@ describe("HandEvaluator Tests", () => {
       { id: "2C", valor: "2", naipe: "C", peso: 2 },
     ]
 
-    const result: result = HandEvaluator.evaluateHand(hand)
+    const result: handResult = HandEvaluator.evaluateHand(hand)
 
     expect(result.nivel).toBe(2)
     expect(result.nome).toBe("Pair")
@@ -224,7 +224,7 @@ describe("HandEvaluator Tests", () => {
       { id: "2O", valor: "2", naipe: "O", peso: 2 },
     ]
 
-    const result: result = HandEvaluator.evaluateHand(hand)
+    const result: handResult = HandEvaluator.evaluateHand(hand)
 
     expect(result.nivel).toBe(1)
     expect(result.nome).toBe("High Card")

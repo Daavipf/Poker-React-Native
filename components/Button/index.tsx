@@ -4,11 +4,12 @@ import { style } from "./style"
 interface Props {
   buttonTitle: string
   onPress?: () => void
+  disabled?: boolean
 }
 
-export default function Button({ buttonTitle, onPress }: Props) {
+export default function Button({ buttonTitle, onPress, disabled = true }: Props) {
   return (
-    <TouchableOpacity style={style.container} onPress={onPress}>
+    <TouchableOpacity style={style.container} onPress={onPress} disabled={!disabled}>
       <Text>{buttonTitle}</Text>
     </TouchableOpacity>
   )

@@ -1,6 +1,6 @@
 import { card } from "@/types/card"
 
-export interface result {
+export interface handResult {
   nivel: number
   nome:
     | "Royal Flush"
@@ -26,7 +26,7 @@ interface valuesMap {
 }
 
 export default class HandEvaluator {
-  static evaluateHand(hand: card[]): result {
+  static evaluateHand(hand: card[]): handResult {
     const suitsMap = this.getSuitsMap(hand)
     const valuesMap = this.getValuesMap(hand)
 
@@ -77,6 +77,54 @@ export default class HandEvaluator {
 
     const highCardKickers = this.getKickers(valuesMap, [], 5)
     return { nivel: 1, nome: "High Card", kickers: highCardKickers }
+  }
+
+  /**
+   * Calcula um bônus de força baseado no potencial da mão (Draws).
+   * @returns number entre 0.0 e 0.30
+   */
+  static getDrawBonus(hand: card[]): number {
+    const suitsMap = this.getSuitsMap(hand)
+    const valuesMap = this.getValuesMap(hand)
+
+    let bonus = 0
+
+    // 1. Flush Draw (4 cartas do mesmo naipe)
+    // Valor alto pois tem ~19% de chance de bater no turn e ~35% até o river
+    for (const key in suitsMap) {
+      if (suitsMap[key].length === 4) {
+        bonus = Math.max(bonus, 0.25) // Bônus forte
+      }
+    }
+
+    // 2. Straight Draw (Sequência incompleta)
+    // Precisamos das chaves únicas ordenadas
+    const keys = this.getValuesMapKeysArray(valuesMap)
+
+    // Analisa janelas de 4 cartas para encontrar quase-sequências
+    for (let i = 0; i <= keys.length - 4; i++) {
+      const subArray = keys.slice(i, i + 4)
+      const high = subArray[3]
+      const low = subArray[0]
+      const diff = high - low
+
+      // Open-Ended Straight Draw (Ex: 5,6,7,8)
+      // Diferença é 3 (8-5=3). Precisa de uma carta em qualquer ponta (4 ou 9).
+      // 8 Outs (~17% no turn, ~31% river)
+      if (diff === 3) {
+        bonus = Math.max(bonus, 0.2)
+      }
+
+      // Gutshot Straight Draw (Ex: 5,6,8,9 ou 5,7,8,9)
+      // Diferença é 4 (9-5=4). Precisa de uma carta específica no meio.
+      // 4 Outs (~8% no turn, ~16% river)
+      else if (diff === 4) {
+        // Só aplicamos se o bônus atual for menor (Flush draw prevalece)
+        bonus = Math.max(bonus, 0.1)
+      }
+    }
+
+    return bonus
   }
 
   private static getSuitsMap(hand: card[]) {

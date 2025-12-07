@@ -34,18 +34,21 @@ export default class RoundManager {
         newPlayers = newTable.setDealerAndBlinds(newPlayers)
         break
       case "FLOP":
+        this.restartPlayersBets(newPlayers)
         newTable.setNextActivePlayerAfterDealer(newPlayers)
         cards = [newDeck.drawCard(), newDeck.drawCard(), newDeck.drawCard()]
         newTable.addCards(cards)
         newTable.resetCurrentBet()
         break
       case "TURN":
+        this.restartPlayersBets(newPlayers)
         newTable.setNextActivePlayerAfterDealer(newPlayers)
         cards = [newDeck.drawCard()]
         newTable.addCards(cards)
         newTable.resetCurrentBet()
         break
       case "RIVER":
+        this.restartPlayersBets(newPlayers)
         newTable.setNextActivePlayerAfterDealer(newPlayers)
         cards = [newDeck.drawCard()]
         newTable.addCards(cards)
@@ -82,6 +85,8 @@ export default class RoundManager {
     const newTable = state.table.clone()
     let newPlayers = state.players.map((player) => player.clone())
     let newMessage = state.message
+
+    newDeck.restartDeck()
 
     newTable.pot = 0
     newTable.communityCards = []
@@ -122,5 +127,14 @@ export default class RoundManager {
   static everyPlayerMoved(players: player[]): boolean {
     let activePlayers = players.filter((p) => !p.isFold)
     return activePlayers.every((p) => p.hasMoved)
+  }
+
+  static restartPlayersBets(players: player[]): player[] {
+    const newPlayers = players.map((p) => {
+      p.currentBet = 0
+      return p
+    })
+
+    return newPlayers
   }
 }

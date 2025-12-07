@@ -1,3 +1,4 @@
+import { AIArchetype } from "@/engine/AI/AIProfile"
 import { card } from "@/types/card"
 
 export interface player {
@@ -17,4 +18,5 @@ export interface player {
   call: (amount: number) => number
   check: (currentBet: number) => void
   clone: () => player
+  archetype?: AIArchetype
 }

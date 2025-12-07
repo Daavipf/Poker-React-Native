@@ -1,5 +1,6 @@
 import { card } from "@/types/card"
 import { player } from "@/types/player"
+import { AIArchetype } from "./AI/AIProfile"
 
 export default class Player implements player {
   name: string
@@ -11,8 +12,9 @@ export default class Player implements player {
   isFold: boolean
   isAllIn: boolean
   hasMoved: boolean
+  archetype?: AIArchetype
 
-  constructor(name: string, chips: number, type: "JOGADOR" | "IA") {
+  constructor(name: string, chips: number, type: "JOGADOR" | "IA", archetype?: AIArchetype) {
     this.name = name
     this.chips = chips
     this.currentBet = 0
@@ -21,6 +23,7 @@ export default class Player implements player {
     this.isFold = false
     this.isAllIn = false
     this.hasMoved = false
+    this.archetype = archetype
   }
 
   setHand(cards: card[]): void {
@@ -42,7 +45,7 @@ export default class Player implements player {
   }
 
   raise(tableCurrentBet: number, amount: number): number {
-    let realBetValue = tableCurrentBet + amount + this.currentBet
+    let realBetValue = tableCurrentBet + amount
     if (this.chips <= realBetValue) {
       const allInBet = this.allIn()
       this.currentBet += allInBet
@@ -77,7 +80,7 @@ export default class Player implements player {
   }
 
   clone(): player {
-    const newPlayer = new Player(this.name, this.chips, this.type)
+    const newPlayer = new Player(this.name, this.chips, this.type, this.archetype)
     newPlayer.hand = [...this.hand]
     newPlayer.isFold = this.isFold
     newPlayer.isAllIn = this.isAllIn

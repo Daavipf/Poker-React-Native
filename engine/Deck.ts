@@ -11,6 +11,11 @@ export default class Deck implements deck {
     this.deck = this.shuffleDeck(this.generateDeck())
   }
 
+  restartDeck() {
+    this.iTopCard = 0
+    this.deck = this.shuffleDeck(this.generateDeck())
+  }
+
   private generateDeck(): card[] {
     let deck = []
     for (const naipe of constants.NAIPES) {

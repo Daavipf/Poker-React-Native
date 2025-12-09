@@ -13,8 +13,9 @@ export default class Player implements player {
   isAllIn: boolean
   hasMoved: boolean
   archetype?: AIArchetype
+  seatIndex: number
 
-  constructor(name: string, chips: number, type: "JOGADOR" | "IA", archetype?: AIArchetype) {
+  constructor(name: string, chips: number, type: "JOGADOR" | "IA", seatIndex: number, archetype?: AIArchetype) {
     this.name = name
     this.chips = chips
     this.currentBet = 0
@@ -24,6 +25,7 @@ export default class Player implements player {
     this.isAllIn = false
     this.hasMoved = false
     this.archetype = archetype
+    this.seatIndex = seatIndex
   }
 
   setHand(cards: card[]): void {
@@ -80,7 +82,7 @@ export default class Player implements player {
   }
 
   clone(): player {
-    const newPlayer = new Player(this.name, this.chips, this.type, this.archetype)
+    const newPlayer = new Player(this.name, this.chips, this.type, this.seatIndex, this.archetype)
     newPlayer.hand = [...this.hand]
     newPlayer.isFold = this.isFold
     newPlayer.isAllIn = this.isAllIn

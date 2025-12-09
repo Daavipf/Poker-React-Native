@@ -12,9 +12,10 @@ const initialState: gameState = {
   phase: "PREFLOP",
   message: "Pré-jogo",
   players: [
-    new Player("Jogador", 1000, "JOGADOR"),
-    new Player("IA 1", 1000, "IA", "MATHEMATICIAN"),
-    new Player("IA 2", 1000, "IA", "MATHEMATICIAN"),
+    new Player("Jogador", 1000, "JOGADOR", 0),
+    new Player("IA 1", 1000, "IA", 1, "MATHEMATICIAN"),
+    new Player("IA 2", 1000, "IA", 2, "MATHEMATICIAN"),
+    new Player("IA 2", 1000, "IA", 3, "MATHEMATICIAN"),
   ],
 }
 
@@ -28,7 +29,7 @@ export default function useGame() {
       setTimeout(() => {
         const action = AI.decideAction(state)
         dispatch(action)
-      }, 1000)
+      }, Math.max(1000, Math.random() * 2000))
     }
   }, [state])
 

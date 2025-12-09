@@ -1,15 +1,16 @@
 import Button from "@/components/Button"
+import PlayerSeats from "@/components/PlayerSeats"
+import Table from "@/components/Table"
 import useGame from "@/hooks/useGame"
-import { useRouter } from "expo-router"
 import { useEffect, useState } from "react"
 import { StyleSheet, Text, View } from "react-native"
 
 export default function Game() {
-  const router = useRouter()
   const { state, dispatch } = useGame()
   const [loading, setLoading] = useState<boolean>(true)
 
   const jogadorAtual = state.players[state.table.iCurrentPlayer]
+  const canCheck = jogadorAtual.currentBet === state.table.currentBet
 
   useEffect(() => {
     setLoading(true)
@@ -17,99 +18,55 @@ export default function Game() {
     setLoading(false)
   }, [])
 
-  function leave() {
-    router.navigate("/mainMenu")
-    router.dismissAll()
-  }
-
   if (loading) {
     return <Text>Carregando...</Text>
   }
 
   return (
-    <View style={style.container}>
-      <View>
-        <Text style={style.center}>Fase: {state.phase}</Text>
-        <Text style={style.center}>Pot: {state.table.pot}</Text>
-        <Text style={style.center}>Bet Atual: {state.table.currentBet}</Text>
-        <Text style={style.center}>{state.message}</Text>
-        {state.phase !== "PREFLOP" && (
-          <View style={style.communityCardsContainer}>
-            {state.table.communityCards.map((carta) => (
-              <Text key={carta.id}>{carta.id}</Text>
-            ))}
-          </View>
-        )}
-      </View>
+    <View style={styles.container}>
+      <Table table={state.table} />
 
-      {/* 2. Renderiza os Jogadores */}
-      <View>
-        {state.players.map((jogador, index) => (
-          <View key={index}>
-            <Text style={[style.center, jogador.isFold ? style.foldedPlayer : null]}>
-              {jogador.name} - {jogador.chips} - {jogador.currentBet}
-            </Text>
+      <PlayerSeats players={state.players} />
 
-            <View style={style.communityCardsContainer}>
-              {jogador.hand.map((carta) => (
-                <Text key={carta.id}>{carta.id}</Text>
-              ))}
-            </View>
-          </View>
-        ))}
-      </View>
-
-      {/* 3. Renderiza as Ações para o jogador ativo */}
-      <View>
-        <Text style={style.center}>Turno de: {jogadorAtual.name}</Text>
-
-        {/* Os botões apenas enviam ações. Eles não sabem a lógica. */}
+      <View style={styles.actionsContainer}>
         <Button
-          disabled={jogadorAtual.type === "JOGADOR"}
           buttonTitle="Fold"
           onPress={() => dispatch({ type: "ACAO_JOGADOR", payload: { move: "FOLD" } })}
+          disabled={jogadorAtual.type === "JOGADOR"}
         />
         <Button
+          buttonTitle={canCheck ? "Check" : "Call"}
+          onPress={() => dispatch({ type: "ACAO_JOGADOR", payload: { move: canCheck ? "CHECK" : "CALL" } })}
           disabled={jogadorAtual.type === "JOGADOR"}
-          buttonTitle="Call"
-          onPress={() => dispatch({ type: "ACAO_JOGADOR", payload: { move: "CALL" } })}
         />
         <Button
-          disabled={jogadorAtual.type === "JOGADOR"}
-          buttonTitle="Check"
-          onPress={() => dispatch({ type: "ACAO_JOGADOR", payload: { move: "CHECK" } })}
-        />
-        <Button
-          disabled={jogadorAtual.type === "JOGADOR"}
           buttonTitle="Raise"
           onPress={() => dispatch({ type: "ACAO_JOGADOR", payload: { move: "RAISE", amount: 50 } })}
-        />
-        <Button
           disabled={jogadorAtual.type === "JOGADOR"}
-          buttonTitle="Next Phase"
-          onPress={() => dispatch({ type: "AVANCAR_FASE" })}
         />
       </View>
-      <Button buttonTitle="Sair" onPress={() => leave()} />
     </View>
   )
 }
 
-const style = StyleSheet.create({
+const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
-    justifyContent: "center",
+    justifyContent: "space-around",
+    alignItems: "center",
+    padding: 12,
   },
   center: {
     textAlign: "center",
-  },
-  communityCardsContainer: {
-    flexDirection: "row",
-    justifyContent: "center",
-    gap: 12,
+    zIndex: 10,
   },
   foldedPlayer: {
     color: "red",
+  },
+  actionsContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    paddingHorizontal: 12,
+    gap: 8,
   },
 })

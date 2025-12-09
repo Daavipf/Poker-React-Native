@@ -11,6 +11,7 @@ export interface player {
   isFold: boolean
   isAllIn: boolean
   hasMoved: boolean
+  seatIndex: number
   setHand: (cards: card[]) => void
   fold: () => void
   allIn: () => number

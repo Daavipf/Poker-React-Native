@@ -59,13 +59,13 @@ Ainda estamos na lógica de negócios, fora do React.
 
 Agora, e só agora, você volta para o React.
 
-7.  **O Orquestrador `useGame`**
+7.  ✅ **O Orquestrador `useGame`**
 
     - Crie seu `useGame` hook, que usa o `gameReducer` (que você acabou de completar).
     - Adicione o `useEffect` que "assiste" o `estado`, especificamente `estado.indiceJogadorAtivo`.
     - Dentro do `useEffect`, verifique o jogador atual: `const jogador = estado.jogadores[estado.indiceJogadorAtivo]`.
 
-8.  **O Loop da IA**
+8.  ✅ **O Loop da IA**
     - **Se `jogador.isHuman === true`:** O `useEffect` não faz nada. O jogo espera o dispatch do front-end.
     - **Se `jogador.isHuman === false` (é uma IA):**
       - É aqui que o `useEffect` chama sua função de decisão de IA.
@@ -82,7 +82,7 @@ Agora, e só agora, você volta para o React.
 
 Agora é a parte fácil e divertida.
 
-9.  **Conectar o Front-End**
+9.  ✅ **Conectar o Front-End**
     - No seu componente `Game.js`, finalmente chame `const { estado, dispatch } = useGame();`.
     - Renderize os dados: `estado.pot`, `estado.cartasComunitarias`, `estado.jogadores.map(...)`.
     - Adicione os botões de ação (`FOLD`, `CALL`, `RAISE`).

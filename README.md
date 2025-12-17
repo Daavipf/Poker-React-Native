@@ -1,50 +1,49 @@
-# Welcome to your Expo app 👋
+# ♠️ Poker AI - React Native Project
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+![Status](https://img.shields.io/badge/Status-In%20Development-yellow)
+![License](https://img.shields.io/badge/License-MIT-blue)
 
-## Get started
+Um aplicativo de Poker (Texas Hold'em) multiplataforma desenvolvido com **React Native**, focado em uma interface minimalista e oponentes controlados por uma Inteligência Artificial com lógica de decisão avançada.
 
-1. Install dependencies
+## 📋 Sobre o Projeto
 
-   ```bash
-   npm install
-   ```
+Este projeto visa criar uma experiência de poker fluida e estrategicamente desafiadora. Diferente de jogos casuais, o foco aqui está na implementação de uma **IA capaz de tomar decisões** baseadas em cálculos de equidade e força da mão.
 
-2. Start the app
+O sistema é construído inteiramente em **TypeScript**, garantindo tipagem forte desde a lógica de jogo no frontend até a persistência de dados no backend.
 
-   ```bash
-   npx expo start
-   ```
+## 🚀 Tecnologias Utilizadas
 
-In the output, you'll find options to open the app in a
+### Mobile (Frontend)
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+- **React Native:** Framework principal para desenvolvimento mobile.
+- **TypeScript:** Linguagem padrão do projeto.
+- **UI/UX:** Design System próprio focado em minimalismo.
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+### Lógica & IA
 
-## Get a fresh project
+- **Algoritmos de Decisão:** Lógica personalizada para NPCs (Fold, Call, Raise).
+- **Fórmula de Chen:** Implementação matemática para avaliação inicial de força das mãos (starting hand strength).
 
-When you're ready, run:
+### Testes Automatizados
+
+- **Jest:** Framework de testes (Unitários e Integração).
+
+## ✨ Funcionalidades Principais
+
+- [x] **Motor de Jogo:** Lógica completa de Texas Hold'em (rodadas de aposta, blind, dealer).
+- [x] **Avaliação de Mãos:** Algoritmo para calcular o vencedor do pote.
+- [x] **IA Básica:** Bots que utilizam a Fórmula de Chen para decidir a entrada na mão.
+- [ ] **IA Avançada:** Lógica de blefe e adaptação ao estilo do jogador (Em desenvolvimento).
+
+## 📂 Estrutura do Projeto
 
 ```bash
-npm run reset-project
+/
+├── app/             # Aplicação React Native
+│   ├── components/ # Componentes visuais (Cartas, Chips, Mesa)
+│   ├── engine/      # Lógica pura (Chen Formula, Hand Evaluator)
+│   ├── hooks/      # Hook personalizado para orquestrar a lógica do jogo
+│   ├── types/      # Tipos e interfaces para tipagem estática
+│   └── app/    # Telas (Game, Menu, Settings)
+│
 ```
-
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
-
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.

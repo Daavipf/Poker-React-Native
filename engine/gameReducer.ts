@@ -67,6 +67,8 @@ function processPlayerAction(action: action, newState: gameState): gameState {
       try {
         currentPlayer.check(table.currentBet)
 
+        newState.message = `${currentPlayer.name} passou.`
+
         table.rotateToNextPlayer(newState.players)
       } catch (error: any) {
         newState.message = error.message

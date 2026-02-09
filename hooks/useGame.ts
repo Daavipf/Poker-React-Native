@@ -31,7 +31,7 @@ export default function useGame() {
           const action = AI.decideAction(state)
           dispatch(action)
         },
-        Math.max(3000, Math.random() * 3000),
+        Math.max(3000, Math.random() * 5000),
       )
     }
   }, [state])

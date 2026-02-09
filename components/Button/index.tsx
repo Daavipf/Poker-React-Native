@@ -9,7 +9,7 @@ interface Props {
 
 export default function Button({ buttonTitle, onPress, disabled = true }: Props) {
   return (
-    <TouchableOpacity style={style.container} onPress={onPress} disabled={!disabled}>
+    <TouchableOpacity style={style.container} onPress={onPress} disabled={disabled}>
       <Text style={style.text}>{buttonTitle}</Text>
     </TouchableOpacity>
   )

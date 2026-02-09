@@ -1,5 +1,6 @@
 import Button from "@/components/Button"
 import PlayerSeats from "@/components/PlayerSeats"
+import RaiseModal from "@/components/RaiseModal"
 import Table from "@/components/Table"
 import useGame from "@/hooks/useGame"
 import { useEffect, useState } from "react"
@@ -7,10 +8,18 @@ import { StyleSheet, Text, View } from "react-native"
 
 export default function Game() {
   const { state, dispatch } = useGame()
+  const [isRaiseModalOpen, setIsRaiseModalOpen] = useState(false)
   const [loading, setLoading] = useState<boolean>(true)
 
   const jogadorAtual = state.players[state.table.iCurrentPlayer]
   const canCheck = jogadorAtual.currentBet === state.table.currentBet
+
+  const handleRaise = (amount: number) => {
+    dispatch({
+      type: "ACAO_JOGADOR",
+      payload: { move: "RAISE", amount },
+    })
+  }
 
   useEffect(() => {
     setLoading(true)
@@ -28,22 +37,25 @@ export default function Game() {
 
       <PlayerSeats players={state.players} iCurrentPlayer={state.table.iCurrentPlayer} />
 
+      <RaiseModal
+        isVisible={isRaiseModalOpen}
+        maxChips={jogadorAtual.chips}
+        onClose={() => setIsRaiseModalOpen(false)}
+        onConfirm={handleRaise}
+      />
+
       <View style={styles.actionsContainer}>
         <Button
           buttonTitle="Fold"
           onPress={() => dispatch({ type: "ACAO_JOGADOR", payload: { move: "FOLD" } })}
-          disabled={jogadorAtual.type === "JOGADOR"}
+          disabled={jogadorAtual.type === "IA"}
         />
         <Button
           buttonTitle={canCheck ? "Check" : "Call"}
           onPress={() => dispatch({ type: "ACAO_JOGADOR", payload: { move: canCheck ? "CHECK" : "CALL" } })}
-          disabled={jogadorAtual.type === "JOGADOR"}
+          disabled={jogadorAtual.type === "IA"}
         />
-        <Button
-          buttonTitle="Raise"
-          onPress={() => dispatch({ type: "ACAO_JOGADOR", payload: { move: "RAISE", amount: 50 } })}
-          disabled={jogadorAtual.type === "JOGADOR"}
-        />
+        <Button buttonTitle="Raise" onPress={() => setIsRaiseModalOpen(true)} disabled={jogadorAtual.type === "IA"} />
       </View>
     </View>
   )

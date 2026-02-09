@@ -42,7 +42,10 @@ export default function Player({ player, style: customStyle, isTurn = false }: P
       {isTurn && player.type === "IA" && <ThinkingBalloon />}
       <View style={[styles.container, customStyle]}>
         <View>
-          <Image style={styles.profile} source={require("@/assets/images/person.png")} />
+          <Image
+            style={player.isFold ? styles.foldProfile : styles.profile}
+            source={require("@/assets/images/person.png")}
+          />
           {getPlayerRole(player.role) && (
             <View style={[styles.roleButton, getButtonStyle(player.role)]}>
               <Text style={player.role === "BIG_BLIND" && styles.bigBlindText}>{getPlayerRole(player.role)}</Text>

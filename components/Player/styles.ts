@@ -12,6 +12,11 @@ export const styles = StyleSheet.create({
     width: 70,
     height: 70,
   },
+  foldProfile: {
+    width: 70,
+    height: 70,
+    opacity: 0.5,
+  },
   info: {
     justifyContent: "center",
     alignItems: "center",

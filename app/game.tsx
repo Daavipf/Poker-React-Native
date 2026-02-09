@@ -24,9 +24,9 @@ export default function Game() {
 
   return (
     <View style={styles.container}>
-      <Table table={state.table} />
+      <Table state={state} />
 
-      <PlayerSeats players={state.players} />
+      <PlayerSeats players={state.players} iCurrentPlayer={state.table.iCurrentPlayer} />
 
       <View style={styles.actionsContainer}>
         <Button

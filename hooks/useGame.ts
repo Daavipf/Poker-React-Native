@@ -26,10 +26,13 @@ export default function useGame() {
     const jogador = state.players[state.table.iCurrentPlayer]
 
     if (jogador.type === "IA") {
-      setTimeout(() => {
-        const action = AI.decideAction(state)
-        dispatch(action)
-      }, Math.max(3000, Math.random() * 3000))
+      setTimeout(
+        () => {
+          const action = AI.decideAction(state)
+          dispatch(action)
+        },
+        Math.max(3000, Math.random() * 3000),
+      )
     }
   }, [state])
 

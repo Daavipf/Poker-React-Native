@@ -7,10 +7,10 @@ import { action, gameReducer } from "../gameReducer"
 let defaultState: gameState = {
   deck: new Deck(),
   players: [
-    new Player("Jogador 1", 1000, "JOGADOR"),
-    new Player("Jogador 2", 1000, "IA"),
-    new Player("Jogador 3", 1000, "IA"),
-    new Player("Jogador 4", 1000, "IA"),
+    new Player("Jogador 1", 1000, "JOGADOR", 0),
+    new Player("Jogador 2", 1000, "IA", 1, "MATHEMATICIAN"),
+    new Player("Jogador 3", 1000, "IA", 2, "MANIAC"),
+    new Player("Jogador 4", 1000, "IA", 3, "CALLING_STATION"),
   ],
   phase: "PREFLOP",
   table: new Table(),

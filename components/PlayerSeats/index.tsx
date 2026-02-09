@@ -7,9 +7,10 @@ import { styles } from "./styles"
 
 interface Props {
   players: player[]
+  iCurrentPlayer: number
 }
 
-export default function PlayerSeats({ players }: Props) {
+export default function PlayerSeats({ players, iCurrentPlayer }: Props) {
   const MAX_SEATS = 8
 
   const humanPlayerServerSeatIndex = players.length > 0 ? players[0].seatIndex : 0
@@ -30,14 +31,15 @@ export default function PlayerSeats({ players }: Props) {
 
   const renderSeat = (seat: (typeof seatsData)[0]) => {
     if (seat.player) {
-      return <Player key={`player-${seat.serverSeatIndex}`} jogador={seat.player} />
+      const isTurn = seat.serverSeatIndex === iCurrentPlayer
+      return <Player key={`player-${seat.serverSeatIndex}`} player={seat.player} isTurn={isTurn} />
     }
 
     return <EmptySeat key={`empty-${seat.serverSeatIndex}`} />
   }
 
   const bottomSeat = seatsData.find((s) => s.visualIndex === 0)
-  const leftSeats = seatsData.filter((s) => s.visualIndex >= 1 && s.visualIndex <= 3).reverse() // Reverse para renderizar de cima pra baixo ou baixo pra cima conforme gosto
+  const leftSeats = seatsData.filter((s) => s.visualIndex >= 1 && s.visualIndex <= 3).reverse()
   const topSeat = seatsData.find((s) => s.visualIndex === 4)
   const rightSeats = seatsData.filter((s) => s.visualIndex >= 5 && s.visualIndex <= 7)
 

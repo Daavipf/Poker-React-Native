@@ -1,15 +1,16 @@
-//import User from "@/assets/images/user-circle-svgrepo-com.svg"
 import { player } from "@/types/player"
 import { Image, StyleProp, Text, View, ViewStyle } from "react-native"
 import Card from "../Card"
+import ThinkingBalloon from "../ThinkingBaloon"
 import { styles } from "./styles"
 
 interface Props {
-  jogador: player
+  player: player
+  isTurn: boolean
   style?: StyleProp<ViewStyle>
 }
 
-export default function Player({ jogador, style: customStyle }: Props) {
+export default function Player({ player, style: customStyle, isTurn = false }: Props) {
   function getPlayerRole(role: "DEALER" | "BIG_BLIND" | "SMALL_BLIND" | undefined) {
     switch (role) {
       case "DEALER":
@@ -36,48 +37,31 @@ export default function Player({ jogador, style: customStyle }: Props) {
     }
   }
 
-  if (jogador.type === "JOGADOR") {
-    return (
-      <View style={styles.playerContainer}>
-        <View style={[styles.container, customStyle]}>
-          <View>
-            <Image style={styles.profile} source={require("@/assets/images/person.png")} />
-            {getPlayerRole(jogador.role) && (
-              <View style={[styles.roleButton, getButtonStyle(jogador.role)]}>
-                <Text style={jogador.role === "BIG_BLIND" && styles.bigBlindText}>{getPlayerRole(jogador.role)}</Text>
-              </View>
-            )}
-          </View>
-
-          <View style={styles.info}>
-            <Text>{jogador.name}</Text>
-            <Text>❂ {jogador.chips}</Text>
-          </View>
+  return (
+    <View style={styles.playerContainer}>
+      {isTurn && player.type === "IA" && <ThinkingBalloon />}
+      <View style={[styles.container, customStyle]}>
+        <View>
+          <Image style={styles.profile} source={require("@/assets/images/person.png")} />
+          {getPlayerRole(player.role) && (
+            <View style={[styles.roleButton, getButtonStyle(player.role)]}>
+              <Text style={player.role === "BIG_BLIND" && styles.bigBlindText}>{getPlayerRole(player.role)}</Text>
+            </View>
+          )}
         </View>
+
+        <View style={isTurn ? styles.infoActive : styles.info}>
+          <Text>{player.name}</Text>
+          <Text>❂ {player.chips}</Text>
+        </View>
+      </View>
+      {player.type === "JOGADOR" && (
         <View style={styles.cardsContainer}>
-          {jogador.hand.map((c, index) => (
-            <Card key={index} card={c} />
+          {player.hand.map((c, index) => (
+            <Card key={index} card={c} hide={player.type === "IA"} />
           ))}
         </View>
-      </View>
-    )
-  }
-
-  return (
-    <View style={[styles.container, customStyle]}>
-      <View>
-        <Image style={styles.profile} source={require("@/assets/images/person.png")} />
-        {getPlayerRole(jogador.role) && (
-          <View style={[styles.roleButton, getButtonStyle(jogador.role)]}>
-            <Text style={jogador.role === "BIG_BLIND" && styles.bigBlindText}>{getPlayerRole(jogador.role)}</Text>
-          </View>
-        )}
-      </View>
-
-      <View style={styles.info}>
-        <Text>{jogador.name}</Text>
-        <Text>❂ {jogador.chips}</Text>
-      </View>
+      )}
     </View>
   )
 }

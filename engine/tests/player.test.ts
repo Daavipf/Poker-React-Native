@@ -5,7 +5,7 @@ describe("Player Tests", () => {
   let player: player
 
   beforeEach(() => {
-    player = new Player("Jogador", 100, "JOGADOR")
+    player = new Player("Jogador", 100, "JOGADOR", 0)
   })
 
   it("should initialize the player correctly", () => {

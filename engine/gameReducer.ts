@@ -32,39 +32,42 @@ export function gameReducer(state: gameState, action: action): gameState {
   return newState
 }
 
-function processPlayerAction(action: action, newState: gameState) {
+function processPlayerAction(action: action, newState: gameState): gameState {
   const { amount, move } = action.payload!
+  let table = newState.table
+  let iCurrentPlayer = table.iCurrentPlayer
+  let currentPlayer = newState.players[iCurrentPlayer]
 
   switch (move) {
     case "FOLD":
-      newState.players[newState.table.iCurrentPlayer].fold()
-      newState.message = `${newState.players[newState.table.iCurrentPlayer].name} saiu.`
+      currentPlayer.fold()
+      newState.message = `${currentPlayer.name} saiu.`
 
       const iWinner = getWinnerByFolds(newState.players)
       if (iWinner !== -1) {
-        newState.table.distributePot(newState.players, iWinner)
+        table.distributePot(newState.players, iWinner)
         newState = RoundManager.restartGame(newState)
 
         return newState
       }
 
-      newState.table.rotateToNextPlayer(newState.players)
+      table.rotateToNextPlayer(newState.players)
 
       break
     case "CALL":
-      let bet = newState.players[newState.table.iCurrentPlayer].call(newState.table.currentBet)
-      newState.table.incrementPot(bet)
+      let bet = currentPlayer.call(table.currentBet)
+      table.incrementPot(bet)
 
-      newState.message = `${newState.players[newState.table.iCurrentPlayer].name} pagou a aposta.`
+      newState.message = `${currentPlayer.name} pagou a aposta.`
 
-      newState.table.rotateToNextPlayer(newState.players)
+      table.rotateToNextPlayer(newState.players)
 
       break
     case "CHECK":
       try {
-        newState.players[newState.table.iCurrentPlayer].check(newState.table.currentBet)
+        currentPlayer.check(table.currentBet)
 
-        newState.table.rotateToNextPlayer(newState.players)
+        table.rotateToNextPlayer(newState.players)
       } catch (error: any) {
         newState.message = error.message
 
@@ -73,36 +76,36 @@ function processPlayerAction(action: action, newState: gameState) {
 
       break
     case "RAISE":
-      let raiseBet = newState.players[newState.table.iCurrentPlayer].raise(newState.table.currentBet, amount!)
-      newState.table.incrementPot(raiseBet)
+      let raiseBet = currentPlayer.raise(table.currentBet, amount!)
+      table.incrementPot(raiseBet)
 
-      if (newState.players[newState.table.iCurrentPlayer].isAllIn) {
-        newState.table.currentBet = raiseBet
+      if (currentPlayer.isAllIn) {
+        table.currentBet = raiseBet
       } else {
-        newState.table.incrementCurrentBet(amount!)
+        table.incrementCurrentBet(amount!)
       }
 
-      newState.message = `${newState.players[newState.table.iCurrentPlayer].name} aumentou a aposta.`
+      newState.message = `${currentPlayer.name} aumentou a aposta.`
 
       newState.players = RoundManager.restartPlayersMove(newState.players)
-      newState.players[newState.table.iCurrentPlayer].hasMoved = true
+      currentPlayer.hasMoved = true
 
-      newState.table.setNextRaiser(newState.table.iCurrentPlayer)
-      newState.table.rotateToNextPlayer(newState.players)
+      table.setNextRaiser(iCurrentPlayer)
+      table.rotateToNextPlayer(newState.players)
 
       break
     case "ALL_IN":
-      let allInBet = newState.players[newState.table.iCurrentPlayer].allIn()
-      newState.table.incrementPot(allInBet)
-      newState.table.incrementCurrentBet(allInBet)
+      let allInBet = currentPlayer.allIn()
+      table.incrementPot(allInBet)
+      table.incrementCurrentBet(allInBet)
 
-      newState.message = `${newState.players[newState.table.iCurrentPlayer].name} deu ALL-IN!`
+      newState.message = `${currentPlayer.name} deu ALL-IN!`
 
       newState.players = RoundManager.restartPlayersMove(newState.players)
-      newState.players[newState.table.iCurrentPlayer].hasMoved = true
+      currentPlayer.hasMoved = true
 
-      newState.table.setNextRaiser(newState.table.iCurrentPlayer)
-      newState.table.rotateToNextPlayer(newState.players)
+      table.setNextRaiser(iCurrentPlayer)
+      table.rotateToNextPlayer(newState.players)
 
       break
     default:

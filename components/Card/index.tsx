@@ -4,11 +4,16 @@ import { styles } from "./styles"
 
 interface Props {
   card?: card
+  hide?: boolean
 }
 
-export default function Card({ card }: Props) {
-  if (!card) {
-    return <View style={[styles.cardContainer, styles.emptyCardSlot]}></View>
+export default function Card({ card, hide }: Props) {
+  if (!card || hide) {
+    return (
+      <View style={[styles.emptyCardContainer, styles.emptyCardSlot]}>
+        <Text>♠️</Text>
+      </View>
+    )
   }
 
   const isRed = card.naipe === "C" || card.naipe === "O"

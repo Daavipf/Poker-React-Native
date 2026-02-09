@@ -19,6 +19,15 @@ export const styles = StyleSheet.create({
     padding: 8,
     borderRadius: 4,
   },
+  infoActive: {
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#FFF",
+    padding: 6,
+    borderWidth: 3,
+    borderColor: "#45a2e0",
+    borderRadius: 8,
+  },
   roleButton: {
     width: 26,
     height: 26,

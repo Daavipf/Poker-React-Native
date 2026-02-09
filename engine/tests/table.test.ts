@@ -36,9 +36,9 @@ describe("Table Tests", () => {
   })
 
   const players = [
-    new Player("Jogador 1", 100, "JOGADOR"),
-    new Player("Jogador 2", 100, "IA"),
-    new Player("Jogador 3", 100, "IA"),
+    new Player("Jogador 1", 100, "JOGADOR", 0),
+    new Player("Jogador 2", 100, "IA", 1),
+    new Player("Jogador 3", 100, "IA", 2),
   ]
 
   it("should set the next player correctly", () => {

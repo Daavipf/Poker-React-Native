@@ -6,8 +6,17 @@ export const styles = StyleSheet.create({
     height: 50,
     borderRadius: 4,
   },
+  emptyCardContainer: {
+    width: 30,
+    height: 50,
+    borderRadius: 4,
+    alignItems: "center",
+    justifyContent: "center",
+  },
   emptyCardSlot: {
-    backgroundColor: "#00000029",
+    backgroundColor: "#00660e",
+    borderWidth: 2,
+    borderColor: "#003803",
   },
   activeCard: {
     backgroundColor: "#FFF",

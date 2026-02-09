@@ -9,6 +9,9 @@ export default function MainMenu() {
       <TouchableOpacity style={style.button} onPress={() => router.navigate("/game")}>
         <Text style={style.text}>Jogar</Text>
       </TouchableOpacity>
+      <TouchableOpacity style={style.button} onPress={() => router.navigate("/debug")}>
+        <Text style={style.text}>Debug</Text>
+      </TouchableOpacity>
       <TouchableOpacity style={style.button}>
         <Text style={style.text}>Sair</Text>
       </TouchableOpacity>

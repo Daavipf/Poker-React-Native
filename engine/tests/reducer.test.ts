@@ -7,10 +7,10 @@ import { action, gameReducer } from "../gameReducer"
 const defaultState: gameState = {
   deck: new Deck(),
   players: [
-    new Player("Jogador 1", 1000, "JOGADOR"),
-    new Player("Jogador 2", 1000, "IA"),
-    new Player("Jogador 3", 1000, "IA"),
-    new Player("Jogador 4", 1000, "IA"),
+    new Player("Jogador", 1000, "JOGADOR", 0),
+    new Player("IA 1", 1000, "IA", 1, "MATHEMATICIAN"),
+    new Player("IA 2", 1000, "IA", 2, "ROCK"),
+    new Player("IA 2", 1000, "IA", 3, "MANIAC"),
   ],
   phase: "PREFLOP",
   table: new Table(),
@@ -64,9 +64,9 @@ describe("Initialization Tests", () => {
     const defaultState: gameState = {
       deck: new Deck(),
       players: [
-        new Player("Jogador 1", 1000, "JOGADOR"),
-        new Player("Jogador 2", 1000, "IA"),
-        new Player("Jogador 3", 1000, "IA"),
+        new Player("Jogador 1", 1000, "JOGADOR", 0),
+        new Player("Jogador 2", 1000, "IA", 1, "MATHEMATICIAN"),
+        new Player("Jogador 3", 1000, "IA", 2, "ROCK"),
       ],
       phase: "PREFLOP",
       table: new Table(),
@@ -80,7 +80,7 @@ describe("Initialization Tests", () => {
   it("Current player index with 2 players", () => {
     const defaultState: gameState = {
       deck: new Deck(),
-      players: [new Player("Jogador 1", 1000, "JOGADOR"), new Player("Jogador 2", 1000, "IA")],
+      players: [new Player("Jogador 1", 1000, "JOGADOR", 0), new Player("Jogador 2", 1000, "IA", 1, "MATHEMATICIAN")],
       phase: "PREFLOP",
       table: new Table(),
       message: "",

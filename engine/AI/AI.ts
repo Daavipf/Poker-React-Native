@@ -23,6 +23,9 @@ export default class AI {
 
       if (isAggressive && ctx.toCallAmount > 0) {
         let actualRaise = this.getAllowedRaiseBet(ctx)
+        if (actualRaise >= player.chips) {
+          return { type: "ACAO_JOGADOR", payload: { move: "ALL_IN", amount: actualRaise } }
+        }
         return { type: "ACAO_JOGADOR", payload: { move: "RAISE", amount: actualRaise } }
       }
 

@@ -10,6 +10,7 @@ export interface player {
   role: "DEALER" | "SMALL_BLIND" | "BIG_BLIND" | undefined
   isFold: boolean
   isAllIn: boolean
+  isBusted: boolean
   hasMoved: boolean
   seatIndex: number
   setHand: (cards: card[]) => void

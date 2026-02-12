@@ -41,7 +41,7 @@ export default class Table implements table {
   rotateToNextPlayer(players: player[]): void {
     let iNextPlayer = (this.iCurrentPlayer + 1) % players.length
 
-    while (players[iNextPlayer].isFold || players[iNextPlayer].isAllIn) {
+    while (players[iNextPlayer].isFold || players[iNextPlayer].isAllIn || players[iNextPlayer].isBusted) {
       iNextPlayer = (iNextPlayer + 1) % players.length
 
       if (iNextPlayer === this.iCurrentPlayer) {
@@ -56,7 +56,7 @@ export default class Table implements table {
   setNextActivePlayerAfterDealer(players: player[]) {
     let iNextPlayer = (this.iDealer + 1) % players.length
 
-    while (players[iNextPlayer].isFold || players[iNextPlayer].isAllIn) {
+    while (players[iNextPlayer].isFold || players[iNextPlayer].isAllIn || players[iNextPlayer].isBusted) {
       iNextPlayer = (iNextPlayer + 1) % players.length
 
       if (iNextPlayer === this.iCurrentPlayer) {

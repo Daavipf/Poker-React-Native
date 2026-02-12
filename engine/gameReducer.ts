@@ -10,6 +10,8 @@ export interface action {
 export function gameReducer(state: gameState, action: action): gameState {
   let newState = { ...state }
 
+  //state.players = state.players.map((p) => (p.chips <= 0 ? { ...p, isBusted: true } : p))
+
   switch (action.type) {
     case "INICIAR_RODADA":
       newState = RoundManager.setUpNewPhase(newState)

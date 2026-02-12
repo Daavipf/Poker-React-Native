@@ -30,7 +30,7 @@ export default function PlayerSeats({ players, iCurrentPlayer }: Props) {
   }, [players, humanPlayerServerSeatIndex])
 
   const renderSeat = (seat: (typeof seatsData)[0]) => {
-    if (seat.player) {
+    if (seat.player && !seat.player.isBusted) {
       const isTurn = seat.serverSeatIndex === iCurrentPlayer
       return <Player key={`player-${seat.serverSeatIndex}`} player={seat.player} isTurn={isTurn} />
     }

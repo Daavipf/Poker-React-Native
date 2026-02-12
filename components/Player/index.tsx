@@ -55,7 +55,7 @@ export default function Player({ player, style: customStyle, isTurn = false }: P
 
         <View style={isTurn ? styles.infoActive : styles.info}>
           <Text>{player.name}</Text>
-          <Text>❂ {player.chips}</Text>
+          {player.isAllIn ? <Text style={styles.allInTag}>ALL-IN</Text> : <Text>❂ {player.chips}</Text>}
         </View>
       </View>
       {player.type === "JOGADOR" && (

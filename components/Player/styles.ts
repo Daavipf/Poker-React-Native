@@ -63,4 +63,13 @@ export const styles = StyleSheet.create({
     flexDirection: "row",
     gap: 4,
   },
+  allInTag: {
+    backgroundColor: "#d63939",
+    padding: 2,
+    paddingHorizontal: 6,
+    borderRadius: 4,
+    color: "#FFF",
+    fontSize: 10,
+    elevation: 2,
+  },
 })

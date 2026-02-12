@@ -12,6 +12,8 @@ export default function Table({ state }: Props) {
 
   return (
     <View style={styles.table}>
+      <Text>Fase: {state.phase}</Text>
+      <Text>Vez de: {state.players[state.table.iCurrentPlayer].name}</Text>
       <Text>Pot: {state.table.pot}</Text>
       <Text>Aposta: {state.table.currentBet}</Text>
       <View style={styles.communityCardsContainer}>

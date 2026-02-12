@@ -11,6 +11,7 @@ export default class Player implements player {
   role: "DEALER" | "SMALL_BLIND" | "BIG_BLIND" | undefined
   isFold: boolean
   isAllIn: boolean
+  isBusted: boolean
   hasMoved: boolean
   archetype?: AIArchetype
   seatIndex: number
@@ -23,6 +24,7 @@ export default class Player implements player {
     this.type = type
     this.isFold = false
     this.isAllIn = false
+    this.isBusted = false
     this.hasMoved = false
     this.archetype = archetype
     this.seatIndex = seatIndex
@@ -44,6 +46,10 @@ export default class Player implements player {
     this.chips = 0
     this.hasMoved = true
     return allInChips
+  }
+
+  out(): void {
+    this.isBusted = true
   }
 
   raise(tableCurrentBet: number, amount: number): number {
@@ -86,6 +92,7 @@ export default class Player implements player {
     newPlayer.hand = [...this.hand]
     newPlayer.isFold = this.isFold
     newPlayer.isAllIn = this.isAllIn
+    newPlayer.isBusted = this.isBusted
     newPlayer.hasMoved = this.hasMoved
     newPlayer.currentBet = this.currentBet
     newPlayer.role = this.role
